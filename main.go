@@ -9,16 +9,18 @@ import (
 	"net"
 	"net/http"
 	"strings"
-	"tenant-management/pkg/config"
-	"tenant-management/pkg/server"
 
 	//grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/coredgeio/tenant-management/api/config/swagger"
-	api "github.com/coredgeio/ai-orchestrator/api/config"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
+
 	//"github.com/coredgeio/compass/pkg/auth"
 	//"github.com/coredgeio/compass/pkg/infra/configdb"
+
+	"github.com/coredgeio/compass/api/config/swagger"
+	api "github.com/coredgeio/tenant-management/api/config"
+	"github.com/coredgeio/tenant-management/pkg/config"
+	"github.com/coredgeio/tenant-management/pkg/server"
 )
 
 const (
