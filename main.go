@@ -10,15 +10,15 @@ import (
 	"net/http"
 	"strings"
 
-	//grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
-	//"github.com/coredgeio/compass/pkg/auth"
-	//"github.com/coredgeio/compass/pkg/infra/configdb"
+	"github.com/coredgeio/compass/pkg/auth"
+	"github.com/coredgeio/compass/pkg/infra/configdb"
 
-	"github.com/coredgeio/compass/api/config/swagger"
 	api "github.com/coredgeio/tenant-management/api/config"
+	"github.com/coredgeio/tenant-management/api/config/swagger"
 	"github.com/coredgeio/tenant-management/pkg/config"
 	"github.com/coredgeio/tenant-management/pkg/server"
 )
@@ -69,31 +69,25 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// following section can be enabled for using mongodb client
-	/*
-		err = configdb.InitializeDatabaseConnection(config.GetMongodbHost(),
-			config.GetMongodbPort(), "compass-config")
-		if err != nil {
-			log.Println("Unable to initialize mongo database connection...")
-			log.Println(err)
-			log.Fatalln("Exiting...")
-		}
+	err = configdb.InitializeDatabaseConnection(config.GetMongodbHost(),
+		config.GetMongodbPort(), "compass-config")
+	if err != nil {
+		log.Println("Unable to initialize mongo database connection...")
+		log.Println(err)
+		log.Fatalln("Exiting...")
+	}
 
-		err = configdb.InitializeMetricsDatabaseConnection(config.GetMetricsdbHost(),
-			config.GetMetricsdbPort(), "compass-metrics")
-		if err != nil {
-			log.Println("Unable to initialize metrics database connection...")
-			log.Println(err)
-			log.Fatalln("Exiting...")
-		}
-	*/
+	err = configdb.InitializeMetricsDatabaseConnection(config.GetMetricsdbHost(),
+		config.GetMetricsdbPort(), "compass-metrics")
+	if err != nil {
+		log.Println("Unable to initialize metrics database connection...")
+		log.Println(err)
+		log.Fatalln("Exiting...")
+	}
 
 	var opts []grpc.ServerOption
-	// following code can be enabled for authentication services
-	/*
-		opts = append(opts, grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(auth.ProcessUserInfoInContext)))
-		opts = append(opts, grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.ProcessUserInfoInContext)))
-	*/
+	opts = append(opts, grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(auth.ProcessUserInfoInContext)))
+	opts = append(opts, grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.ProcessUserInfoInContext)))
 	grpcServer := grpc.NewServer(opts...)
 	api.RegisterSampleApiServer(grpcServer, server.NewSampleApiServer())
 	lis, err := net.Listen("tcp", GRPC_PORT)
