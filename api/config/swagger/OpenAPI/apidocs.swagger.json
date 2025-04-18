@@ -7,6 +7,9 @@
   "tags": [
     {
       "name": "SampleApi"
+    },
+    {
+      "name": "TenantManagement"
     }
   ],
   "consumes": [
@@ -16,6 +19,68 @@
     "application/json"
   ],
   "paths": {
+    "/api/tenant-mgmt/v1/tenant/{name}/kyb": {
+      "get": {
+        "operationId": "TenantManagement_GetKybStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configKybStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "org name for kyb req",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantManagement"
+        ]
+      }
+    },
+    "/api/tenant-mgmt/v1/tenant/{name}/kyc": {
+      "get": {
+        "operationId": "TenantManagement_GetKycStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configKycStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "org name for kyc req",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantManagement"
+        ]
+      }
+    },
     "/v1/project/{project}": {
       "get": {
         "summary": "hello world",
@@ -44,7 +109,7 @@
           },
           {
             "name": "offset",
-            "description": "query parameter following type match requirements.",
+            "description": "query parameter following type match requirements",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -52,7 +117,7 @@
           },
           {
             "name": "text",
-            "description": "string query parameter.",
+            "description": "string query parameter",
             "in": "query",
             "required": false,
             "type": "string"
@@ -83,6 +148,37 @@
         }
       }
     },
+    "configKybStatusResp": {
+      "type": "object",
+      "properties": {
+        "kybStatus": {
+          "$ref": "#/definitions/configStatusInfo"
+        }
+      },
+      "title": "Kyb Status for tenant"
+    },
+    "configKycStatusResp": {
+      "type": "object",
+      "properties": {
+        "kycStatus": {
+          "$ref": "#/definitions/configStatusInfo"
+        }
+      },
+      "title": "Kyc Status for tenant"
+    },
+    "configStatusInfo": {
+      "type": "string",
+      "enum": [
+        "KycPending",
+        "KycInProcess",
+        "KycFailed",
+        "KycPartial",
+        "KycDone",
+        "ReKycNeeded"
+      ],
+      "default": "KycPending",
+      "title": "- KycPending: Kyc pending\n - KycInProcess: Kyc in-process\n - KycFailed: Kyc failed\n - KycPartial: Kyc Partial\n - KycDone: Kyc done\n - ReKycNeeded: rekyc needed"
+    },
     "protobufAny": {
       "type": "object",
       "properties": {
@@ -105,6 +201,7 @@
         "details": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/protobufAny"
           }
         }

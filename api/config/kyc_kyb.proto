@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package config;
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/coredgeio/tenant-management/api/config";
+
+// These annotations are used when generating the OpenAPI file.
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    version: "1.0"
+    title: "TenantManagement API "
+  }
+  external_docs: {
+    description: "TenantManagement API, KYC_KYB"
+  }
+};
+
+service TenantManagement {
+  
+  rpc GetKycStatus(KycStatusGetReq) returns (KycStatusResp) {
+    option (google.api.http) = {
+        get: "/api/tenant-mgmt/v1/tenant/{name}/kyc"
+    };
+  }
+ 
+  rpc GetKybStatus(KybStatusGetReq) returns (KybStatusResp) {
+    option (google.api.http) = {
+        get: "/api/tenant-mgmt/v1/tenant/{name}/kyb"
+    };
+  }
+}
+
+message KycStatusGetReq {
+    //org name for kyc req
+   string name = 1;
+}
+
+message KybStatusGetReq {
+    //org name for kyb req
+   string name = 1;
+}
+
+
+enum StatusInfo{
+
+    // Kyc pending
+     KycPending = 0;
+
+    // Kyc in-process
+     KycInProcess = 1;
+
+    // Kyc failed
+     KycFailed = 2;
+
+    // Kyc Partial
+     KycPartial = 3;
+
+    // Kyc done
+     KycDone = 4;
+
+    // rekyc needed
+     ReKycNeeded = 5;
+}
+
+
+message KycStatusResp {
+    // Kyc Status for tenant
+
+    StatusInfo kycStatus = 1;
+}
+
+message KybStatusResp {
+    // Kyb Status for tenant
+
+   StatusInfo kybStatus = 1;
+    
+}
+
