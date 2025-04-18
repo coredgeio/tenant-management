@@ -90,6 +90,7 @@ func main() {
 	opts = append(opts, grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.ProcessUserInfoInContext)))
 	grpcServer := grpc.NewServer(opts...)
 	api.RegisterSampleApiServer(grpcServer, server.NewSampleApiServer())
+	api.RegisterTenantManagementServer(grpcServer, server.NewTenantManagementServer())
 	lis, err := net.Listen("tcp", GRPC_PORT)
 	if err != nil {
 		log.Fatalf("failed to listen: %v for grpc server", err)
@@ -125,6 +126,10 @@ func main() {
 	err = api.RegisterSampleApiHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatal("Failed to register Sample api handler with gateway:", err)
+	}
+	err = api.RegisterTenantManagementHandler(context.Background(), gwmux, conn)
+	if err != nil {
+		log.Fatal("Failed to register TenantManagement handler with gateway:", err)
 	}
 
 	oa := getOpenAPIHandler()
