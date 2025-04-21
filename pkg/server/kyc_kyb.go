@@ -27,7 +27,7 @@ func (s *TenantManagementServer) GetKycStatus(ctx context.Context, req *api.KycS
 
 	// Sample logic — could fetch status from a DB or other service
 	resp := &api.KycStatusResp{
-		KycStatus: api.StatusInfo_KycDone, // returning an enum value
+		KycStatus: api.StatusInfo_Done, // returning an enum value
 	}
 	return resp, nil
 }
@@ -41,7 +41,7 @@ func (s *TenantManagementServer) GetKybStatus(ctx context.Context, req *api.KybS
 
 	// Sample logic — could fetch status from a DB or other service
 	resp := &api.KybStatusResp{
-		KybStatus: api.StatusInfo_KycPending, // returning an enum value
+		KybStatus: api.StatusInfo_Pending, // returning an enum value
 	}
 	return resp, nil
 }

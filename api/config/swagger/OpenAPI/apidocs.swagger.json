@@ -169,15 +169,15 @@
     "configStatusInfo": {
       "type": "string",
       "enum": [
-        "KycPending",
-        "KycInProcess",
-        "KycFailed",
-        "KycPartial",
-        "KycDone",
-        "ReKycNeeded"
+        "Pending",
+        "InProcess",
+        "Failed",
+        "Partial",
+        "Done",
+        "ReVerificationNeeded"
       ],
-      "default": "KycPending",
-      "title": "- KycPending: Kyc pending\n - KycInProcess: Kyc in-process\n - KycFailed: Kyc failed\n - KycPartial: Kyc Partial\n - KycDone: Kyc done\n - ReKycNeeded: rekyc needed"
+      "default": "Pending",
+      "title": "- Pending: pending\n - InProcess: in-process\n - Failed: failed\n - Partial: Partial\n - Done: done\n - ReVerificationNeeded: needed"
     },
     "protobufAny": {
       "type": "object",

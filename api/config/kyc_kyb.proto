@@ -45,23 +45,23 @@ message KybStatusGetReq {
 
 enum StatusInfo{
 
-    // Kyc pending
-     KycPending = 0;
+    // pending
+     Pending = 0;
 
-    // Kyc in-process
-     KycInProcess = 1;
+    // in-process
+     InProcess = 1;
 
-    // Kyc failed
-     KycFailed = 2;
+    //  failed
+     Failed = 2;
 
-    // Kyc Partial
-     KycPartial = 3;
+    //  Partial
+     Partial = 3;
 
-    // Kyc done
-     KycDone = 4;
+    //  done
+     Done = 4;
 
-    // rekyc needed
-     ReKycNeeded = 5;
+    //  needed
+     ReVerificationNeeded = 5;
 }
 
 

@@ -26,37 +26,37 @@ const (
 type StatusInfo int32
 
 const (
-	// Kyc pending
-	StatusInfo_KycPending StatusInfo = 0
-	// Kyc in-process
-	StatusInfo_KycInProcess StatusInfo = 1
-	// Kyc failed
-	StatusInfo_KycFailed StatusInfo = 2
-	// Kyc Partial
-	StatusInfo_KycPartial StatusInfo = 3
-	// Kyc done
-	StatusInfo_KycDone StatusInfo = 4
-	// rekyc needed
-	StatusInfo_ReKycNeeded StatusInfo = 5
+	// pending
+	StatusInfo_Pending StatusInfo = 0
+	// in-process
+	StatusInfo_InProcess StatusInfo = 1
+	// failed
+	StatusInfo_Failed StatusInfo = 2
+	// Partial
+	StatusInfo_Partial StatusInfo = 3
+	// done
+	StatusInfo_Done StatusInfo = 4
+	// needed
+	StatusInfo_ReVerificationNeeded StatusInfo = 5
 )
 
 // Enum value maps for StatusInfo.
 var (
 	StatusInfo_name = map[int32]string{
-		0: "KycPending",
-		1: "KycInProcess",
-		2: "KycFailed",
-		3: "KycPartial",
-		4: "KycDone",
-		5: "ReKycNeeded",
+		0: "Pending",
+		1: "InProcess",
+		2: "Failed",
+		3: "Partial",
+		4: "Done",
+		5: "ReVerificationNeeded",
 	}
 	StatusInfo_value = map[string]int32{
-		"KycPending":   0,
-		"KycInProcess": 1,
-		"KycFailed":    2,
-		"KycPartial":   3,
-		"KycDone":      4,
-		"ReKycNeeded":  5,
+		"Pending":              0,
+		"InProcess":            1,
+		"Failed":               2,
+		"Partial":              3,
+		"Done":                 4,
+		"ReVerificationNeeded": 5,
 	}
 )
 
@@ -218,7 +218,7 @@ func (x *KycStatusResp) GetKycStatus() StatusInfo {
 	if x != nil {
 		return x.KycStatus
 	}
-	return StatusInfo_KycPending
+	return StatusInfo_Pending
 }
 
 type KybStatusResp struct {
@@ -262,7 +262,7 @@ func (x *KybStatusResp) GetKybStatus() StatusInfo {
 	if x != nil {
 		return x.KybStatus
 	}
-	return StatusInfo_KycPending
+	return StatusInfo_Pending
 }
 
 var File_kyc_kyb_proto protoreflect.FileDescriptor
@@ -277,17 +277,16 @@ const file_kyc_kyb_proto_rawDesc = "" +
 	"\rKycStatusResp\x120\n" +
 	"\tkycStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\tkycStatus\"A\n" +
 	"\rKybStatusResp\x120\n" +
-	"\tkybStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\tkybStatus*k\n" +
+	"\tkybStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\tkybStatus*e\n" +
 	"\n" +
-	"StatusInfo\x12\x0e\n" +
+	"StatusInfo\x12\v\n" +
+	"\aPending\x10\x00\x12\r\n" +
+	"\tInProcess\x10\x01\x12\n" +
 	"\n" +
-	"KycPending\x10\x00\x12\x10\n" +
-	"\fKycInProcess\x10\x01\x12\r\n" +
-	"\tKycFailed\x10\x02\x12\x0e\n" +
-	"\n" +
-	"KycPartial\x10\x03\x12\v\n" +
-	"\aKycDone\x10\x04\x12\x0f\n" +
-	"\vReKycNeeded\x10\x052\xf0\x01\n" +
+	"\x06Failed\x10\x02\x12\v\n" +
+	"\aPartial\x10\x03\x12\b\n" +
+	"\x04Done\x10\x04\x12\x18\n" +
+	"\x14ReVerificationNeeded\x10\x052\xf0\x01\n" +
 	"\x10TenantManagement\x12m\n" +
 	"\fGetKycStatus\x12\x17.config.KycStatusGetReq\x1a\x15.config.KycStatusResp\"-\x82\xd3\xe4\x93\x02'\x12%/api/tenant-mgmt/v1/tenant/{name}/kyc\x12m\n" +
 	"\fGetKybStatus\x12\x17.config.KybStatusGetReq\x1a\x15.config.KybStatusResp\"-\x82\xd3\xe4\x93\x02'\x12%/api/tenant-mgmt/v1/tenant/{name}/kybBu\x92A?\x12\x1c\n" +

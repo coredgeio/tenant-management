@@ -10,6 +10,7 @@ package config
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 
@@ -24,110 +25,92 @@ import (
 )
 
 // Suppress "imported and not used" errors
-var _ codes.Code
-var _ io.Reader
-var _ status.Status
-var _ = runtime.String
-var _ = utilities.NewDoubleArray
-var _ = metadata.Join
-
 var (
-	filter_SampleApi_HelloWorld_0 = &utilities.DoubleArray{Encoding: map[string]int{"project": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	_ codes.Code
+	_ io.Reader
+	_ status.Status
+	_ = errors.New
+	_ = runtime.String
+	_ = utilities.NewDoubleArray
+	_ = metadata.Join
 )
 
+var filter_SampleApi_HelloWorld_0 = &utilities.DoubleArray{Encoding: map[string]int{"project": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+
 func request_SampleApi_HelloWorld_0(ctx context.Context, marshaler runtime.Marshaler, client SampleApiClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HelloWorldReq
-	var metadata runtime.ServerMetadata
-
 	var (
-		val string
-		ok  bool
-		err error
-		_   = err
+		protoReq HelloWorldReq
+		metadata runtime.ServerMetadata
+		err      error
 	)
-
-	val, ok = pathParams["project"]
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["project"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "project")
 	}
-
 	protoReq.Project, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "project", err)
 	}
-
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SampleApi_HelloWorld_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
 	msg, err := client.HelloWorld(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
-
 }
 
 func local_request_SampleApi_HelloWorld_0(ctx context.Context, marshaler runtime.Marshaler, server SampleApiServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq HelloWorldReq
-	var metadata runtime.ServerMetadata
-
 	var (
-		val string
-		ok  bool
-		err error
-		_   = err
+		protoReq HelloWorldReq
+		metadata runtime.ServerMetadata
+		err      error
 	)
-
-	val, ok = pathParams["project"]
+	val, ok := pathParams["project"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "project")
 	}
-
 	protoReq.Project, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "project", err)
 	}
-
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_SampleApi_HelloWorld_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
-
 	msg, err := server.HelloWorld(ctx, &protoReq)
 	return msg, metadata, err
-
 }
 
 // RegisterSampleApiHandlerServer registers the http handlers for service SampleApi to "mux".
 // UnaryRPC     :call SampleApiServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterSampleApiHandlerFromEndpoint instead.
+// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterSampleApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, server SampleApiServer) error {
-
-	mux.Handle("GET", pattern_SampleApi_HelloWorld_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_SampleApi_HelloWorld_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/config.SampleApi/HelloWorld", runtime.WithHTTPPathPattern("/v1/project/{project}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/config.SampleApi/HelloWorld", runtime.WithHTTPPathPattern("/v1/project/{project}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_SampleApi_HelloWorld_0(rctx, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_SampleApi_HelloWorld_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-
-		forward_SampleApi_HelloWorld_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
+		forward_SampleApi_HelloWorld_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -136,25 +119,24 @@ func RegisterSampleApiHandlerServer(ctx context.Context, mux *runtime.ServeMux, 
 // RegisterSampleApiHandlerFromEndpoint is same as RegisterSampleApiHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterSampleApiHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.Dial(endpoint, opts...)
+	conn, err := grpc.NewClient(endpoint, opts...)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
-
 	return RegisterSampleApiHandler(ctx, mux, conn)
 }
 
@@ -168,29 +150,25 @@ func RegisterSampleApiHandler(ctx context.Context, mux *runtime.ServeMux, conn *
 // to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "SampleApiClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "SampleApiClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "SampleApiClient" to call the correct interceptors.
+// "SampleApiClient" to call the correct interceptors. This client ignores the HTTP middlewares.
 func RegisterSampleApiHandlerClient(ctx context.Context, mux *runtime.ServeMux, client SampleApiClient) error {
-
-	mux.Handle("GET", pattern_SampleApi_HelloWorld_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_SampleApi_HelloWorld_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/config.SampleApi/HelloWorld", runtime.WithHTTPPathPattern("/v1/project/{project}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/config.SampleApi/HelloWorld", runtime.WithHTTPPathPattern("/v1/project/{project}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_SampleApi_HelloWorld_0(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
+		resp, md, err := request_SampleApi_HelloWorld_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-
-		forward_SampleApi_HelloWorld_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
+		forward_SampleApi_HelloWorld_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-
 	return nil
 }
 
