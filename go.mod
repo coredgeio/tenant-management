@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.8
 
 require (
-	github.com/coredgeio/compass v0.0.0-20250513063304-16a8224f89bd
+	github.com/coredgeio/compass v0.0.0-20250516102325-de2bf6ff323e
 	github.com/coredgeio/orbiter-auth v0.0.0-20250511064054-a7ecee4ecf78
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3

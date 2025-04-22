@@ -8,6 +8,8 @@ github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDk
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
 github.com/coredgeio/compass v0.0.0-20250513063304-16a8224f89bd h1:4xNxIAtlxHajWtBKMP1/F1EHgrTOSkzjBPZ0eKQb7d8=
 github.com/coredgeio/compass v0.0.0-20250513063304-16a8224f89bd/go.mod h1:t4D7qA4El8bCkVL20xxhKblOjsp8JoCjBCro6a6NPUE=
+github.com/coredgeio/compass v0.0.0-20250516102325-de2bf6ff323e h1:qKnmIHnt3buUxUzGsX6LsK4/5Te2n58j2IWNJhYU1vk=
+github.com/coredgeio/compass v0.0.0-20250516102325-de2bf6ff323e/go.mod h1:t4D7qA4El8bCkVL20xxhKblOjsp8JoCjBCro6a6NPUE=
 github.com/coredgeio/orbiter-auth v0.0.0-20250511064054-a7ecee4ecf78 h1:ZuZOJGxFEDUFkitMTCLUS5+GJPvt7xS0vIDeNHZMQgg=
 github.com/coredgeio/orbiter-auth v0.0.0-20250511064054-a7ecee4ecf78/go.mod h1:QfZGYlPMIcUHGoyrbff6csZVOGzdd9rlXnpkYcZhId0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

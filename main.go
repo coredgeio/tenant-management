@@ -14,10 +14,11 @@ import (
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
+	tenantruntime "github.com/coredgeio/compass/controller/pkg/runtime/tenant"
 	"github.com/coredgeio/compass/pkg/auth"
 	"github.com/coredgeio/compass/pkg/infra/configdb"
 
-	api "github.com/coredgeio/tenant-management/api/config"
+	apiConfig "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
 	"github.com/coredgeio/tenant-management/pkg/config"
 	"github.com/coredgeio/tenant-management/pkg/server"
@@ -85,12 +86,25 @@ func main() {
 		log.Fatalln("Exiting...")
 	}
 
+	_, err = tenantruntime.NewTenantConfigTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create tenant config table")
+	}
+
+	// start the manager for KYB
+	if config.GetTenantLevelKYCEnabled() {
+		log.Println("Starting Tenant Level KYC manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the KYC status at the tenant level collection
+
+	}
+
 	var opts []grpc.ServerOption
 	opts = append(opts, grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(auth.ProcessUserInfoInContext)))
 	opts = append(opts, grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.ProcessUserInfoInContext)))
 	grpcServer := grpc.NewServer(opts...)
 
-	api.RegisterTenantMgmtApiServer(grpcServer, server.NewTenantManagementServer())
+	apiConfig.RegisterTenantMgmtApiServer(grpcServer, server.NewTenantManagementServer())
 
 	lis, err := net.Listen("tcp", GRPC_PORT)
 	if err != nil {
@@ -115,16 +129,14 @@ func main() {
 
 	gwmux := gwruntime.NewServeMux(gwruntime.WithIncomingHeaderMatcher(func(key string) (string, bool) {
 		// enable this section while using orbiter-auth module
-		/*
-			if key == auth.UserInfoHeader {
-				return auth.UserInfoContext, true
-			}
-		*/
+		if key == auth.UserInfoHeader {
+			return auth.UserInfoContext, true
+		}
 		return key, false
 	}))
 
 	// Register Tenant Managemnet API server
-	err = api.RegisterTenantMgmtApiHandler(context.Background(), gwmux, conn)
+	err = apiConfig.RegisterTenantMgmtApiHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatal("Failed to register Tenant Management api handler with gateway:", err)
 	}

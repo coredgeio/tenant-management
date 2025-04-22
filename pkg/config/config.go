@@ -16,6 +16,23 @@ type configType struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
 	} `yaml:"metricsdb"`
+	Client struct {
+		Name string `yaml:"name"`
+	} `yaml:"client"`
+	TenantLevelKYC struct {
+		Enabled           bool   `yaml:"enabled"`
+		ServerPath        string `yaml:"serverPath"`
+		PollingTime       int    `yaml:"pollingTime"`
+		StopUpdateOnceSet bool   `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"tenantLevelKyc"`
 }
 
 var config configType
@@ -38,6 +55,51 @@ func GetMetricsdbHost() string {
 // GetMetricsdbPort returns configured metricsdb port
 func GetMetricsdbPort() string {
 	return config.MetricsDB.Port
+}
+
+// GetClientName returns configured client name
+func GetClientName() string {
+	return config.Client.Name
+}
+
+// GetTenantLevelKYCEnabled returns configured TenantLevelKYC enabled
+func GetTenantLevelKYCEnabled() bool {
+	return config.TenantLevelKYC.Enabled
+}
+
+// GetTenantLevelKYCServerPath returns configured TenantLevelKYC server path
+func GetTenantLevelKYCServerPath() string {
+	return config.TenantLevelKYC.ServerPath
+}
+
+// GetTenantLevelKYCPollingTime returns configured TenantLevelKYC polling time
+func GetTenantLevelKYCPollingTime() int {
+	return config.TenantLevelKYC.PollingTime
+}
+
+// GetTenantLevelKYCStopUpdateOnceSet returns configured TenantLevelKYC stop update once set
+func GetTenantLevelKYCStopUpdateOnceSet() bool {
+	return config.TenantLevelKYC.StopUpdateOnceSet
+}
+
+// GetBaseUrl returns the base URL
+func GetTenantLevelKYCBaseUrl() string {
+	return config.TenantLevelKYC.RequestDetails.BaseUrl
+}
+
+// GetHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetTenantLevelKYCHttpMethod() string {
+	return config.TenantLevelKYC.RequestDetails.HttpMethod
+}
+
+// GetAuthorization returns the Authorization header value
+func GetTenantLevelKYCAuthorization() string {
+	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetContentType returns the Content-Type header value
+func GetTenantLevelKYCContentType() string {
+	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.ContentType
 }
 
 // validateConfigPath just makes sure, that the path provided is a file,
