@@ -19,16 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	TenantManagement_GetKycStatus_FullMethodName = "/config.TenantManagement/GetKycStatus"
-	TenantManagement_GetKybStatus_FullMethodName = "/config.TenantManagement/GetKybStatus"
+	TenantManagement_GetTenantUserLevelKycStatus_FullMethodName = "/config.TenantManagement/GetTenantUserLevelKycStatus"
+	TenantManagement_GetTenantLevelKCStatus_FullMethodName      = "/config.TenantManagement/GetTenantLevelKCStatus"
 )
 
 // TenantManagementClient is the client API for TenantManagement service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TenantManagementClient interface {
-	GetKycStatus(ctx context.Context, in *KycStatusGetReq, opts ...grpc.CallOption) (*KycStatusResp, error)
-	GetKybStatus(ctx context.Context, in *KybStatusGetReq, opts ...grpc.CallOption) (*KybStatusResp, error)
+	GetTenantUserLevelKycStatus(ctx context.Context, in *TenantUserLevelKycGetReq, opts ...grpc.CallOption) (*TenantUserLevelKycResp, error)
+	GetTenantLevelKCStatus(ctx context.Context, in *TenantLevelKCGetReq, opts ...grpc.CallOption) (*TenantLevelKCResp, error)
 }
 
 type tenantManagementClient struct {
@@ -39,20 +39,20 @@ func NewTenantManagementClient(cc grpc.ClientConnInterface) TenantManagementClie
 	return &tenantManagementClient{cc}
 }
 
-func (c *tenantManagementClient) GetKycStatus(ctx context.Context, in *KycStatusGetReq, opts ...grpc.CallOption) (*KycStatusResp, error) {
+func (c *tenantManagementClient) GetTenantUserLevelKycStatus(ctx context.Context, in *TenantUserLevelKycGetReq, opts ...grpc.CallOption) (*TenantUserLevelKycResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(KycStatusResp)
-	err := c.cc.Invoke(ctx, TenantManagement_GetKycStatus_FullMethodName, in, out, cOpts...)
+	out := new(TenantUserLevelKycResp)
+	err := c.cc.Invoke(ctx, TenantManagement_GetTenantUserLevelKycStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *tenantManagementClient) GetKybStatus(ctx context.Context, in *KybStatusGetReq, opts ...grpc.CallOption) (*KybStatusResp, error) {
+func (c *tenantManagementClient) GetTenantLevelKCStatus(ctx context.Context, in *TenantLevelKCGetReq, opts ...grpc.CallOption) (*TenantLevelKCResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(KybStatusResp)
-	err := c.cc.Invoke(ctx, TenantManagement_GetKybStatus_FullMethodName, in, out, cOpts...)
+	out := new(TenantLevelKCResp)
+	err := c.cc.Invoke(ctx, TenantManagement_GetTenantLevelKCStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,8 +63,8 @@ func (c *tenantManagementClient) GetKybStatus(ctx context.Context, in *KybStatus
 // All implementations must embed UnimplementedTenantManagementServer
 // for forward compatibility.
 type TenantManagementServer interface {
-	GetKycStatus(context.Context, *KycStatusGetReq) (*KycStatusResp, error)
-	GetKybStatus(context.Context, *KybStatusGetReq) (*KybStatusResp, error)
+	GetTenantUserLevelKycStatus(context.Context, *TenantUserLevelKycGetReq) (*TenantUserLevelKycResp, error)
+	GetTenantLevelKCStatus(context.Context, *TenantLevelKCGetReq) (*TenantLevelKCResp, error)
 	mustEmbedUnimplementedTenantManagementServer()
 }
 
@@ -75,11 +75,11 @@ type TenantManagementServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTenantManagementServer struct{}
 
-func (UnimplementedTenantManagementServer) GetKycStatus(context.Context, *KycStatusGetReq) (*KycStatusResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetKycStatus not implemented")
+func (UnimplementedTenantManagementServer) GetTenantUserLevelKycStatus(context.Context, *TenantUserLevelKycGetReq) (*TenantUserLevelKycResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTenantUserLevelKycStatus not implemented")
 }
-func (UnimplementedTenantManagementServer) GetKybStatus(context.Context, *KybStatusGetReq) (*KybStatusResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetKybStatus not implemented")
+func (UnimplementedTenantManagementServer) GetTenantLevelKCStatus(context.Context, *TenantLevelKCGetReq) (*TenantLevelKCResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTenantLevelKCStatus not implemented")
 }
 func (UnimplementedTenantManagementServer) mustEmbedUnimplementedTenantManagementServer() {}
 func (UnimplementedTenantManagementServer) testEmbeddedByValue()                          {}
@@ -102,38 +102,38 @@ func RegisterTenantManagementServer(s grpc.ServiceRegistrar, srv TenantManagemen
 	s.RegisterService(&TenantManagement_ServiceDesc, srv)
 }
 
-func _TenantManagement_GetKycStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(KycStatusGetReq)
+func _TenantManagement_GetTenantUserLevelKycStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TenantUserLevelKycGetReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TenantManagementServer).GetKycStatus(ctx, in)
+		return srv.(TenantManagementServer).GetTenantUserLevelKycStatus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TenantManagement_GetKycStatus_FullMethodName,
+		FullMethod: TenantManagement_GetTenantUserLevelKycStatus_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TenantManagementServer).GetKycStatus(ctx, req.(*KycStatusGetReq))
+		return srv.(TenantManagementServer).GetTenantUserLevelKycStatus(ctx, req.(*TenantUserLevelKycGetReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TenantManagement_GetKybStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(KybStatusGetReq)
+func _TenantManagement_GetTenantLevelKCStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TenantLevelKCGetReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TenantManagementServer).GetKybStatus(ctx, in)
+		return srv.(TenantManagementServer).GetTenantLevelKCStatus(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: TenantManagement_GetKybStatus_FullMethodName,
+		FullMethod: TenantManagement_GetTenantLevelKCStatus_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TenantManagementServer).GetKybStatus(ctx, req.(*KybStatusGetReq))
+		return srv.(TenantManagementServer).GetTenantLevelKCStatus(ctx, req.(*TenantLevelKCGetReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -146,12 +146,12 @@ var TenantManagement_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TenantManagementServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetKycStatus",
-			Handler:    _TenantManagement_GetKycStatus_Handler,
+			MethodName: "GetTenantUserLevelKycStatus",
+			Handler:    _TenantManagement_GetTenantUserLevelKycStatus_Handler,
 		},
 		{
-			MethodName: "GetKybStatus",
-			Handler:    _TenantManagement_GetKybStatus_Handler,
+			MethodName: "GetTenantLevelKCStatus",
+			Handler:    _TenantManagement_GetTenantLevelKCStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -19,25 +19,25 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 
 service TenantManagement {
   
-  rpc GetKycStatus(KycStatusGetReq) returns (KycStatusResp) {
+  rpc GetTenantUserLevelKycStatus(TenantUserLevelKycGetReq) returns (TenantUserLevelKycResp) {
     option (google.api.http) = {
-        get: "/api/tenant-mgmt/v1/tenant/{name}/kyc"
+        get: "/v1/api/tenant-mgmt/tenant/{name}/kyc"
     };
   }
  
-  rpc GetKybStatus(KybStatusGetReq) returns (KybStatusResp) {
+  rpc GetTenantLevelKCStatus(TenantLevelKCGetReq) returns (TenantLevelKCResp) {
     option (google.api.http) = {
-        get: "/api/tenant-mgmt/v1/tenant/{name}/kyb"
+        get: "/v1/api/tenant-mgmt/v1/tenant/{name}/kyb"
     };
   }
 }
 
-message KycStatusGetReq {
+message TenantUserLevelKycGetReq {
     //org name for kyc req
    string name = 1;
 }
 
-message KybStatusGetReq {
+message TenantLevelKCGetReq {
     //org name for kyb req
    string name = 1;
 }
@@ -45,36 +45,33 @@ message KybStatusGetReq {
 
 enum StatusInfo{
 
-    // pending
+    //Process is pending
      Pending = 0;
 
     // in-process
      InProcess = 1;
 
-    //  failed
+    //Process has failed
      Failed = 2;
 
-    //  Partial
+    //Process is Partially complete
      Partial = 3;
 
-    //  done
+    //Process is done
      Done = 4;
 
-    //  needed
+    // ReVerification is needed
      ReVerificationNeeded = 5;
 }
 
 
-message KycStatusResp {
-    // Kyc Status for tenant
-
-    StatusInfo kycStatus = 1;
+message TenantUserLevelKycResp {
+    // TenantUserLevelKyc Status for tenant
+    StatusInfo TenantUserLevelKycStatus = 1;
 }
 
-message KybStatusResp {
-    // Kyb Status for tenant
-
-   StatusInfo kybStatus = 1;
-    
+message TenantLevelKCResp {
+    // TenantLevelKC Status for tenant
+   StatusInfo TenantLevelKCStatus = 1;   
 }
 

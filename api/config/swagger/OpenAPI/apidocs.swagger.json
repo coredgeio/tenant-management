@@ -19,45 +19,14 @@
     "application/json"
   ],
   "paths": {
-    "/api/tenant-mgmt/v1/tenant/{name}/kyb": {
+    "/v1/api/tenant-mgmt/tenant/{name}/kyc": {
       "get": {
-        "operationId": "TenantManagement_GetKybStatus",
+        "operationId": "TenantManagement_GetTenantUserLevelKycStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/configKybStatusResp"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "name",
-            "description": "org name for kyb req",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "TenantManagement"
-        ]
-      }
-    },
-    "/api/tenant-mgmt/v1/tenant/{name}/kyc": {
-      "get": {
-        "operationId": "TenantManagement_GetKycStatus",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/configKycStatusResp"
+              "$ref": "#/definitions/configTenantUserLevelKycResp"
             }
           },
           "default": {
@@ -71,6 +40,37 @@
           {
             "name": "name",
             "description": "org name for kyc req",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantManagement"
+        ]
+      }
+    },
+    "/v1/api/tenant-mgmt/v1/tenant/{name}/kyb": {
+      "get": {
+        "operationId": "TenantManagement_GetTenantLevelKCStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantLevelKCResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "org name for kyb req",
             "in": "path",
             "required": true,
             "type": "string"
@@ -148,24 +148,6 @@
         }
       }
     },
-    "configKybStatusResp": {
-      "type": "object",
-      "properties": {
-        "kybStatus": {
-          "$ref": "#/definitions/configStatusInfo"
-        }
-      },
-      "title": "Kyb Status for tenant"
-    },
-    "configKycStatusResp": {
-      "type": "object",
-      "properties": {
-        "kycStatus": {
-          "$ref": "#/definitions/configStatusInfo"
-        }
-      },
-      "title": "Kyc Status for tenant"
-    },
     "configStatusInfo": {
       "type": "string",
       "enum": [
@@ -177,7 +159,25 @@
         "ReVerificationNeeded"
       ],
       "default": "Pending",
-      "title": "- Pending: pending\n - InProcess: in-process\n - Failed: failed\n - Partial: Partial\n - Done: done\n - ReVerificationNeeded: needed"
+      "title": "- Pending: Process is pending\n - InProcess: in-process\n - Failed: Process has failed\n - Partial: Process is Partially complete\n - Done: Process is done\n - ReVerificationNeeded: ReVerification is needed"
+    },
+    "configTenantLevelKCResp": {
+      "type": "object",
+      "properties": {
+        "TenantLevelKCStatus": {
+          "$ref": "#/definitions/configStatusInfo",
+          "title": "TenantLevelKC Status for tenant"
+        }
+      }
+    },
+    "configTenantUserLevelKycResp": {
+      "type": "object",
+      "properties": {
+        "TenantUserLevelKycStatus": {
+          "$ref": "#/definitions/configStatusInfo",
+          "title": "TenantUserLevelKyc Status for tenant"
+        }
+      }
     },
     "protobufAny": {
       "type": "object",

@@ -26,17 +26,17 @@ const (
 type StatusInfo int32
 
 const (
-	// pending
+	// Process is pending
 	StatusInfo_Pending StatusInfo = 0
 	// in-process
 	StatusInfo_InProcess StatusInfo = 1
-	// failed
+	// Process has failed
 	StatusInfo_Failed StatusInfo = 2
-	// Partial
+	// Process is Partially complete
 	StatusInfo_Partial StatusInfo = 3
-	// done
+	// Process is done
 	StatusInfo_Done StatusInfo = 4
-	// needed
+	// ReVerification is needed
 	StatusInfo_ReVerificationNeeded StatusInfo = 5
 )
 
@@ -87,7 +87,7 @@ func (StatusInfo) EnumDescriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{0}
 }
 
-type KycStatusGetReq struct {
+type TenantUserLevelKycGetReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// org name for kyc req
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -95,20 +95,20 @@ type KycStatusGetReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *KycStatusGetReq) Reset() {
-	*x = KycStatusGetReq{}
+func (x *TenantUserLevelKycGetReq) Reset() {
+	*x = TenantUserLevelKycGetReq{}
 	mi := &file_kyc_kyb_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *KycStatusGetReq) String() string {
+func (x *TenantUserLevelKycGetReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*KycStatusGetReq) ProtoMessage() {}
+func (*TenantUserLevelKycGetReq) ProtoMessage() {}
 
-func (x *KycStatusGetReq) ProtoReflect() protoreflect.Message {
+func (x *TenantUserLevelKycGetReq) ProtoReflect() protoreflect.Message {
 	mi := &file_kyc_kyb_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -120,19 +120,19 @@ func (x *KycStatusGetReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use KycStatusGetReq.ProtoReflect.Descriptor instead.
-func (*KycStatusGetReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use TenantUserLevelKycGetReq.ProtoReflect.Descriptor instead.
+func (*TenantUserLevelKycGetReq) Descriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *KycStatusGetReq) GetName() string {
+func (x *TenantUserLevelKycGetReq) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-type KybStatusGetReq struct {
+type TenantLevelKCGetReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// org name for kyb req
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -140,20 +140,20 @@ type KybStatusGetReq struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *KybStatusGetReq) Reset() {
-	*x = KybStatusGetReq{}
+func (x *TenantLevelKCGetReq) Reset() {
+	*x = TenantLevelKCGetReq{}
 	mi := &file_kyc_kyb_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *KybStatusGetReq) String() string {
+func (x *TenantLevelKCGetReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*KybStatusGetReq) ProtoMessage() {}
+func (*TenantLevelKCGetReq) ProtoMessage() {}
 
-func (x *KybStatusGetReq) ProtoReflect() protoreflect.Message {
+func (x *TenantLevelKCGetReq) ProtoReflect() protoreflect.Message {
 	mi := &file_kyc_kyb_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -165,39 +165,40 @@ func (x *KybStatusGetReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use KybStatusGetReq.ProtoReflect.Descriptor instead.
-func (*KybStatusGetReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use TenantLevelKCGetReq.ProtoReflect.Descriptor instead.
+func (*TenantLevelKCGetReq) Descriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *KybStatusGetReq) GetName() string {
+func (x *TenantLevelKCGetReq) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-type KycStatusResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	KycStatus     StatusInfo             `protobuf:"varint,1,opt,name=kycStatus,proto3,enum=config.StatusInfo" json:"kycStatus,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type TenantUserLevelKycResp struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// TenantUserLevelKyc Status for tenant
+	TenantUserLevelKycStatus StatusInfo `protobuf:"varint,1,opt,name=TenantUserLevelKycStatus,proto3,enum=config.StatusInfo" json:"TenantUserLevelKycStatus,omitempty"`
+	unknownFields            protoimpl.UnknownFields
+	sizeCache                protoimpl.SizeCache
 }
 
-func (x *KycStatusResp) Reset() {
-	*x = KycStatusResp{}
+func (x *TenantUserLevelKycResp) Reset() {
+	*x = TenantUserLevelKycResp{}
 	mi := &file_kyc_kyb_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *KycStatusResp) String() string {
+func (x *TenantUserLevelKycResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*KycStatusResp) ProtoMessage() {}
+func (*TenantUserLevelKycResp) ProtoMessage() {}
 
-func (x *KycStatusResp) ProtoReflect() protoreflect.Message {
+func (x *TenantUserLevelKycResp) ProtoReflect() protoreflect.Message {
 	mi := &file_kyc_kyb_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -209,39 +210,40 @@ func (x *KycStatusResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use KycStatusResp.ProtoReflect.Descriptor instead.
-func (*KycStatusResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use TenantUserLevelKycResp.ProtoReflect.Descriptor instead.
+func (*TenantUserLevelKycResp) Descriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *KycStatusResp) GetKycStatus() StatusInfo {
+func (x *TenantUserLevelKycResp) GetTenantUserLevelKycStatus() StatusInfo {
 	if x != nil {
-		return x.KycStatus
+		return x.TenantUserLevelKycStatus
 	}
 	return StatusInfo_Pending
 }
 
-type KybStatusResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	KybStatus     StatusInfo             `protobuf:"varint,1,opt,name=kybStatus,proto3,enum=config.StatusInfo" json:"kybStatus,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type TenantLevelKCResp struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// TenantLevelKC Status for tenant
+	TenantLevelKCStatus StatusInfo `protobuf:"varint,1,opt,name=TenantLevelKCStatus,proto3,enum=config.StatusInfo" json:"TenantLevelKCStatus,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
-func (x *KybStatusResp) Reset() {
-	*x = KybStatusResp{}
+func (x *TenantLevelKCResp) Reset() {
+	*x = TenantLevelKCResp{}
 	mi := &file_kyc_kyb_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *KybStatusResp) String() string {
+func (x *TenantLevelKCResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*KybStatusResp) ProtoMessage() {}
+func (*TenantLevelKCResp) ProtoMessage() {}
 
-func (x *KybStatusResp) ProtoReflect() protoreflect.Message {
+func (x *TenantLevelKCResp) ProtoReflect() protoreflect.Message {
 	mi := &file_kyc_kyb_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -253,14 +255,14 @@ func (x *KybStatusResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use KybStatusResp.ProtoReflect.Descriptor instead.
-func (*KybStatusResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use TenantLevelKCResp.ProtoReflect.Descriptor instead.
+func (*TenantLevelKCResp) Descriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *KybStatusResp) GetKybStatus() StatusInfo {
+func (x *TenantLevelKCResp) GetTenantLevelKCStatus() StatusInfo {
 	if x != nil {
-		return x.KybStatus
+		return x.TenantLevelKCStatus
 	}
 	return StatusInfo_Pending
 }
@@ -269,15 +271,15 @@ var File_kyc_kyb_proto protoreflect.FileDescriptor
 
 const file_kyc_kyb_proto_rawDesc = "" +
 	"\n" +
-	"\rkyc_kyb.proto\x12\x06config\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\"%\n" +
-	"\x0fKycStatusGetReq\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"%\n" +
-	"\x0fKybStatusGetReq\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\"A\n" +
-	"\rKycStatusResp\x120\n" +
-	"\tkycStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\tkycStatus\"A\n" +
-	"\rKybStatusResp\x120\n" +
-	"\tkybStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\tkybStatus*e\n" +
+	"\rkyc_kyb.proto\x12\x06config\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\".\n" +
+	"\x18TenantUserLevelKycGetReq\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\")\n" +
+	"\x13TenantLevelKCGetReq\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\"h\n" +
+	"\x16TenantUserLevelKycResp\x12N\n" +
+	"\x18TenantUserLevelKycStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\x18TenantUserLevelKycStatus\"Y\n" +
+	"\x11TenantLevelKCResp\x12D\n" +
+	"\x13TenantLevelKCStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\x13TenantLevelKCStatus*e\n" +
 	"\n" +
 	"StatusInfo\x12\v\n" +
 	"\aPending\x10\x00\x12\r\n" +
@@ -286,10 +288,10 @@ const file_kyc_kyb_proto_rawDesc = "" +
 	"\x06Failed\x10\x02\x12\v\n" +
 	"\aPartial\x10\x03\x12\b\n" +
 	"\x04Done\x10\x04\x12\x18\n" +
-	"\x14ReVerificationNeeded\x10\x052\xf0\x01\n" +
-	"\x10TenantManagement\x12m\n" +
-	"\fGetKycStatus\x12\x17.config.KycStatusGetReq\x1a\x15.config.KycStatusResp\"-\x82\xd3\xe4\x93\x02'\x12%/api/tenant-mgmt/v1/tenant/{name}/kyc\x12m\n" +
-	"\fGetKybStatus\x12\x17.config.KybStatusGetReq\x1a\x15.config.KybStatusResp\"-\x82\xd3\xe4\x93\x02'\x12%/api/tenant-mgmt/v1/tenant/{name}/kybBu\x92A?\x12\x1c\n" +
+	"\x14ReVerificationNeeded\x10\x052\xa8\x02\n" +
+	"\x10TenantManagement\x12\x8e\x01\n" +
+	"\x1bGetTenantUserLevelKycStatus\x12 .config.TenantUserLevelKycGetReq\x1a\x1e.config.TenantUserLevelKycResp\"-\x82\xd3\xe4\x93\x02'\x12%/v1/api/tenant-mgmt/tenant/{name}/kyc\x12\x82\x01\n" +
+	"\x16GetTenantLevelKCStatus\x12\x1b.config.TenantLevelKCGetReq\x1a\x19.config.TenantLevelKCResp\"0\x82\xd3\xe4\x93\x02*\x12(/v1/api/tenant-mgmt/v1/tenant/{name}/kybBu\x92A?\x12\x1c\n" +
 	"\x15TenantManagement API 2\x031.0r\x1f\n" +
 	"\x1dTenantManagement API, KYC_KYBZ1github.com/coredgeio/tenant-management/api/configb\x06proto3"
 
@@ -308,19 +310,19 @@ func file_kyc_kyb_proto_rawDescGZIP() []byte {
 var file_kyc_kyb_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_kyc_kyb_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_kyc_kyb_proto_goTypes = []any{
-	(StatusInfo)(0),         // 0: config.StatusInfo
-	(*KycStatusGetReq)(nil), // 1: config.KycStatusGetReq
-	(*KybStatusGetReq)(nil), // 2: config.KybStatusGetReq
-	(*KycStatusResp)(nil),   // 3: config.KycStatusResp
-	(*KybStatusResp)(nil),   // 4: config.KybStatusResp
+	(StatusInfo)(0),                  // 0: config.StatusInfo
+	(*TenantUserLevelKycGetReq)(nil), // 1: config.TenantUserLevelKycGetReq
+	(*TenantLevelKCGetReq)(nil),      // 2: config.TenantLevelKCGetReq
+	(*TenantUserLevelKycResp)(nil),   // 3: config.TenantUserLevelKycResp
+	(*TenantLevelKCResp)(nil),        // 4: config.TenantLevelKCResp
 }
 var file_kyc_kyb_proto_depIdxs = []int32{
-	0, // 0: config.KycStatusResp.kycStatus:type_name -> config.StatusInfo
-	0, // 1: config.KybStatusResp.kybStatus:type_name -> config.StatusInfo
-	1, // 2: config.TenantManagement.GetKycStatus:input_type -> config.KycStatusGetReq
-	2, // 3: config.TenantManagement.GetKybStatus:input_type -> config.KybStatusGetReq
-	3, // 4: config.TenantManagement.GetKycStatus:output_type -> config.KycStatusResp
-	4, // 5: config.TenantManagement.GetKybStatus:output_type -> config.KybStatusResp
+	0, // 0: config.TenantUserLevelKycResp.TenantUserLevelKycStatus:type_name -> config.StatusInfo
+	0, // 1: config.TenantLevelKCResp.TenantLevelKCStatus:type_name -> config.StatusInfo
+	1, // 2: config.TenantManagement.GetTenantUserLevelKycStatus:input_type -> config.TenantUserLevelKycGetReq
+	2, // 3: config.TenantManagement.GetTenantLevelKCStatus:input_type -> config.TenantLevelKCGetReq
+	3, // 4: config.TenantManagement.GetTenantUserLevelKycStatus:output_type -> config.TenantUserLevelKycResp
+	4, // 5: config.TenantManagement.GetTenantLevelKCStatus:output_type -> config.TenantLevelKCResp
 	4, // [4:6] is the sub-list for method output_type
 	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name

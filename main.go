@@ -2,24 +2,24 @@ package main
 
 import (
 	"context"
-	"flag"
 	"io/fs"
+	//"flag"
 	"log"
 	"mime"
 	"net"
 	"net/http"
 	"strings"
 
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	//grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
-	"github.com/coredgeio/compass/pkg/auth"
-	"github.com/coredgeio/compass/pkg/infra/configdb"
+	//"github.com/coredgeio/compass/pkg/auth"
+	//"github.com/coredgeio/compass/pkg/infra/configdb"
 
-	api "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
-	"github.com/coredgeio/tenant-management/pkg/config"
+	api "github.com/coredgeio/tenant-management/api/config"
+	//"github.com/coredgeio/tenant-management/pkg/config"
 	"github.com/coredgeio/tenant-management/pkg/server"
 )
 
@@ -34,6 +34,7 @@ const (
 
 // parseFlags will create and parse the CLI flags
 // and return the path to be used elsewhere
+/*
 func parseFlags() (string, error) {
 	var configPath string
 
@@ -47,7 +48,7 @@ func parseFlags() (string, error) {
 	// Return the configuration path
 	return configPath, nil
 }
-
+*/
 func getOpenAPIHandler() http.Handler {
 	mime.AddExtensionType(".svg", "image/svg+xml")
 	// Use subdirectory in embedded files
@@ -59,23 +60,26 @@ func getOpenAPIHandler() http.Handler {
 }
 
 func main() {
-	cfgPath, err := parseFlags()
-	if err != nil {
-		log.Fatal(err)
-	}
+	/*
+		cfgPath, err := parseFlags()
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	err = config.ParseConfig(cfgPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = configdb.InitializeDatabaseConnection(config.GetMongodbHost(),
-		config.GetMongodbPort(), "compass-config")
-	if err != nil {
-		log.Println("Unable to initialize mongo database connection...")
-		log.Println(err)
-		log.Fatalln("Exiting...")
-	}
+		err = config.ParseConfig(cfgPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+	*/
+	// following section can be enabled for using mongodb client
+	/*
+		err = configdb.InitializeDatabaseConnection(config.GetMongodbHost(),
+			config.GetMongodbPort(), "compass-config")
+		if err != nil {
+			log.Println("Unable to initialize mongo database connection...")
+			log.Println(err)
+			log.Fatalln("Exiting...")
+		}
 
 	err = configdb.InitializeMetricsDatabaseConnection(config.GetMetricsdbHost(),
 		config.GetMetricsdbPort(), "compass-metrics")
@@ -84,10 +88,12 @@ func main() {
 		log.Println(err)
 		log.Fatalln("Exiting...")
 	}
-
+	*/
 	var opts []grpc.ServerOption
+	/*
 	opts = append(opts, grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(auth.ProcessUserInfoInContext)))
 	opts = append(opts, grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.ProcessUserInfoInContext)))
+	*/
 	grpcServer := grpc.NewServer(opts...)
 	api.RegisterSampleApiServer(grpcServer, server.NewSampleApiServer())
 	api.RegisterTenantManagementServer(grpcServer, server.NewTenantManagementServer())
@@ -136,7 +142,7 @@ func main() {
 	gwServer := &http.Server{
 		Addr: API_PORT,
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, "/v") {
+			if strings.HasPrefix(r.URL.Path, "/v")  {
 				gwmux.ServeHTTP(w, r)
 				return
 			}
