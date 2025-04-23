@@ -61,8 +61,13 @@ func (a *AiRev) GetKycStatus(body []byte) (tenant.KYCStatus, error) {
 }
 
 func (a *AiRev) GetPaymentConfiguredStatus(body []byte) (bool, error) {
-
-	return false, nil
+	var resp GenericResponse
+	err := json.Unmarshal(body, &resp)
+	if err != nil {
+		log.Printf("Error while unmarshaling response for Payment Configured in AiRev, error: %s\n", err)
+		return false, err
+	}
+	return resp.Data.PaymentDetails.PaymentMethodAvailable, nil
 }
 
 func (a *AiRev) GetTenantType(body []byte) (string, error) {

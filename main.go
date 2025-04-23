@@ -21,7 +21,9 @@ import (
 	apiConfig "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
 	"github.com/coredgeio/tenant-management/pkg/config"
+	"github.com/coredgeio/tenant-management/pkg/paymentconfigured"
 	"github.com/coredgeio/tenant-management/pkg/server"
+	tenantkyc "github.com/coredgeio/tenant-management/pkg/tenantkyc"
 )
 
 const (
@@ -91,12 +93,21 @@ func main() {
 		log.Fatalln("unable to locate or create tenant config table")
 	}
 
-	// start the manager for KYB
+	// start the manager for tenant Level KYC
 	if config.GetTenantLevelKYCEnabled() {
 		log.Println("Starting Tenant Level KYC manager...")
 		// call tenant level manager which is working on notification from tenant collections
 		// and updating the KYC status at the tenant level collection
+		// create tenant role manager
+		_ = tenantkyc.CreateKybManager()
+	}
 
+	// start the manager for KYB
+	if config.GetPaymentMethodConfigurationEnabled() {
+		log.Println("Starting Payment Configuration manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Payment Configuration status at the tenant level collection
+		_ = paymentconfigured.CreatePaymentConfiguredManager()
 	}
 
 	var opts []grpc.ServerOption

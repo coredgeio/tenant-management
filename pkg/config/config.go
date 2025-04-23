@@ -30,9 +30,25 @@ type configType struct {
 			DefaultHeaders struct {
 				Authorization string `yaml:"authorization"`
 				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
 			} `yaml:"defaultHeaders"`
 		} `yaml:"requestDetails"`
 	} `yaml:"tenantLevelKyc"`
+	PaymentConfigurationForTenant struct {
+		Enabled           bool   `yaml:"enabled"`
+		ServerPath        string `yaml:"serverPath"`
+		PollingTime       int    `yaml:"pollingTime"`
+		StopUpdateOnceSet bool   `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"paymentConfigurationForTenant"`
 }
 
 var config configType
@@ -100,6 +116,46 @@ func GetTenantLevelKYCAuthorization() string {
 // GetContentType returns the Content-Type header value
 func GetTenantLevelKYCContentType() string {
 	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetPaymentMethodConfigurationEnabled returns configured Payment Configuration enabled
+func GetPaymentMethodConfigurationEnabled() bool {
+	return config.PaymentConfigurationForTenant.Enabled
+}
+
+// GetPaymentMethodConfigurationServerPath returns configured payment configuration server path
+func GetPaymentMethodConfigurationServerPath() string {
+	return config.PaymentConfigurationForTenant.ServerPath
+}
+
+// GetPaymentMethodConfigurationPollingTime returns configured Payment configuration polling time
+func GetPaymentMethodConfigurationPollingTime() int {
+	return config.PaymentConfigurationForTenant.PollingTime
+}
+
+// GetPaymentMethodConfigurationStopUpdateOnceSet returns configured Payment Configuration stop update once set
+func GetPaymentMethodConfigurationStopUpdateOnceSet() bool {
+	return config.PaymentConfigurationForTenant.StopUpdateOnceSet
+}
+
+// GetPaymentMethodConfigurationBaseUrl returns the base URL
+func GetPaymentMethodConfigurationBaseUrl() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.BaseUrl
+}
+
+// GetPaymentMethodConfigurationHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetPaymentMethodConfigurationHttpMethod() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.HttpMethod
+}
+
+// GetPaymentMethodConfigurationAuthorization returns the Authorization header value
+func GetPaymentMethodConfigurationAuthorization() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetPaymentMethodConfigurationContentType returns the Content-Type header value
+func GetPaymentMethodConfigurationContentType() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.ContentType
 }
 
 // validateConfigPath just makes sure, that the path provided is a file,
