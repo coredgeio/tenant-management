@@ -32,7 +32,7 @@ func (s *TenantManagementServer) GetTenantUserLevelKycStatus(ctx context.Context
 	return resp, nil
 }
 
-func (s *TenantManagementServer) GetTenantLevelKCStatus(ctx context.Context, req *api.TenantLevelKCGetReq) (*api.TenantLevelKCResp, error) {
+func (s *TenantManagementServer) GetTenantLevelKycStatus(ctx context.Context, req *api.TenantLevelKycGetReq) (*api.TenantLevelKycResp, error) {
 	log.Printf("Received KYB status request for tenant: %s", req.GetName())
 
 	if req.GetName() == "" {
@@ -40,8 +40,8 @@ func (s *TenantManagementServer) GetTenantLevelKCStatus(ctx context.Context, req
 	}
 
 	// Sample logic — could fetch status from a DB or other service
-	resp := &api.TenantLevelKCResp{
-		TenantLevelKCStatus: api.StatusInfo_Pending, // returning an enum value
+	resp := &api.TenantLevelKycResp{
+		TenantLevelKycStatus: api.StatusInfo_Pending, // returning an enum value
 	}
 	return resp, nil
 }

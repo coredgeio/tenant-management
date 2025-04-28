@@ -72,9 +72,9 @@ func local_request_TenantManagement_GetTenantUserLevelKycStatus_0(ctx context.Co
 	return msg, metadata, err
 }
 
-func request_TenantManagement_GetTenantLevelKCStatus_0(ctx context.Context, marshaler runtime.Marshaler, client TenantManagementClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_TenantManagement_GetTenantLevelKycStatus_0(ctx context.Context, marshaler runtime.Marshaler, client TenantManagementClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq TenantLevelKCGetReq
+		protoReq TenantLevelKycGetReq
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -87,13 +87,13 @@ func request_TenantManagement_GetTenantLevelKCStatus_0(ctx context.Context, mars
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
-	msg, err := client.GetTenantLevelKCStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.GetTenantLevelKycStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 }
 
-func local_request_TenantManagement_GetTenantLevelKCStatus_0(ctx context.Context, marshaler runtime.Marshaler, server TenantManagementServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func local_request_TenantManagement_GetTenantLevelKycStatus_0(ctx context.Context, marshaler runtime.Marshaler, server TenantManagementServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
-		protoReq TenantLevelKCGetReq
+		protoReq TenantLevelKycGetReq
 		metadata runtime.ServerMetadata
 		err      error
 	)
@@ -105,7 +105,7 @@ func local_request_TenantManagement_GetTenantLevelKCStatus_0(ctx context.Context
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
-	msg, err := server.GetTenantLevelKCStatus(ctx, &protoReq)
+	msg, err := server.GetTenantLevelKycStatus(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -135,25 +135,25 @@ func RegisterTenantManagementHandlerServer(ctx context.Context, mux *runtime.Ser
 		}
 		forward_TenantManagement_GetTenantUserLevelKycStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_TenantManagement_GetTenantLevelKCStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_TenantManagement_GetTenantLevelKycStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/config.TenantManagement/GetTenantLevelKCStatus", runtime.WithHTTPPathPattern("/v1/api/tenant-mgmt/v1/tenant/{name}/kyb"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/config.TenantManagement/GetTenantLevelKycStatus", runtime.WithHTTPPathPattern("/v1/api/tenant-mgmt/tenant/{name}/kyb"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_TenantManagement_GetTenantLevelKCStatus_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_TenantManagement_GetTenantLevelKycStatus_0(annotatedContext, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_TenantManagement_GetTenantLevelKCStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_TenantManagement_GetTenantLevelKycStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -212,32 +212,32 @@ func RegisterTenantManagementHandlerClient(ctx context.Context, mux *runtime.Ser
 		}
 		forward_TenantManagement_GetTenantUserLevelKycStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
-	mux.Handle(http.MethodGet, pattern_TenantManagement_GetTenantLevelKCStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle(http.MethodGet, pattern_TenantManagement_GetTenantLevelKycStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/config.TenantManagement/GetTenantLevelKCStatus", runtime.WithHTTPPathPattern("/v1/api/tenant-mgmt/v1/tenant/{name}/kyb"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/config.TenantManagement/GetTenantLevelKycStatus", runtime.WithHTTPPathPattern("/v1/api/tenant-mgmt/tenant/{name}/kyb"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_TenantManagement_GetTenantLevelKCStatus_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_TenantManagement_GetTenantLevelKycStatus_0(annotatedContext, inboundMarshaler, client, req, pathParams)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_TenantManagement_GetTenantLevelKCStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_TenantManagement_GetTenantLevelKycStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	return nil
 }
 
 var (
 	pattern_TenantManagement_GetTenantUserLevelKycStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"v1", "api", "tenant-mgmt", "tenant", "name", "kyc"}, ""))
-	pattern_TenantManagement_GetTenantLevelKCStatus_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 0, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"v1", "api", "tenant-mgmt", "tenant", "name", "kyb"}, ""))
+	pattern_TenantManagement_GetTenantLevelKycStatus_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5}, []string{"v1", "api", "tenant-mgmt", "tenant", "name", "kyb"}, ""))
 )
 
 var (
 	forward_TenantManagement_GetTenantUserLevelKycStatus_0 = runtime.ForwardResponseMessage
-	forward_TenantManagement_GetTenantLevelKCStatus_0      = runtime.ForwardResponseMessage
+	forward_TenantManagement_GetTenantLevelKycStatus_0     = runtime.ForwardResponseMessage
 )

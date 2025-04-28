@@ -13,7 +13,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
     title: "TenantManagement API "
   }
   external_docs: {
-    description: "TenantManagement API, KYC_KYB"
+    description: "TenantManagement API, TenantUserLevelKYC-TenantLevelKYC"
   }
 };
 
@@ -25,20 +25,20 @@ service TenantManagement {
     };
   }
  
-  rpc GetTenantLevelKCStatus(TenantLevelKCGetReq) returns (TenantLevelKCResp) {
+  rpc GetTenantLevelKycStatus(TenantLevelKycGetReq) returns (TenantLevelKycResp) {
     option (google.api.http) = {
-        get: "/v1/api/tenant-mgmt/v1/tenant/{name}/kyb"
+        get: "/v1/api/tenant-mgmt/tenant/{name}/kyb"
     };
   }
 }
 
 message TenantUserLevelKycGetReq {
-    //org name for kyc req
+    //org name for tenantleveluserkyc req
    string name = 1;
 }
 
-message TenantLevelKCGetReq {
-    //org name for kyb req
+message TenantLevelKycGetReq {
+    //org name for tenantlevelkyc req
    string name = 1;
 }
 
@@ -70,8 +70,8 @@ message TenantUserLevelKycResp {
     StatusInfo TenantUserLevelKycStatus = 1;
 }
 
-message TenantLevelKCResp {
-    // TenantLevelKC Status for tenant
-   StatusInfo TenantLevelKCStatus = 1;   
+message TenantLevelKycResp {
+    // TenantLevelKyc Status for tenant
+   StatusInfo TenantLevelKycStatus = 1;   
 }
 

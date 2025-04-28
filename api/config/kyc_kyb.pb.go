@@ -89,7 +89,7 @@ func (StatusInfo) EnumDescriptor() ([]byte, []int) {
 
 type TenantUserLevelKycGetReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// org name for kyc req
+	// org name for tenantleveluserkyc req
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -132,28 +132,28 @@ func (x *TenantUserLevelKycGetReq) GetName() string {
 	return ""
 }
 
-type TenantLevelKCGetReq struct {
+type TenantLevelKycGetReq struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// org name for kyb req
+	// org name for tenantlevelkyc req
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *TenantLevelKCGetReq) Reset() {
-	*x = TenantLevelKCGetReq{}
+func (x *TenantLevelKycGetReq) Reset() {
+	*x = TenantLevelKycGetReq{}
 	mi := &file_kyc_kyb_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TenantLevelKCGetReq) String() string {
+func (x *TenantLevelKycGetReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TenantLevelKCGetReq) ProtoMessage() {}
+func (*TenantLevelKycGetReq) ProtoMessage() {}
 
-func (x *TenantLevelKCGetReq) ProtoReflect() protoreflect.Message {
+func (x *TenantLevelKycGetReq) ProtoReflect() protoreflect.Message {
 	mi := &file_kyc_kyb_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -165,12 +165,12 @@ func (x *TenantLevelKCGetReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TenantLevelKCGetReq.ProtoReflect.Descriptor instead.
-func (*TenantLevelKCGetReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use TenantLevelKycGetReq.ProtoReflect.Descriptor instead.
+func (*TenantLevelKycGetReq) Descriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *TenantLevelKCGetReq) GetName() string {
+func (x *TenantLevelKycGetReq) GetName() string {
 	if x != nil {
 		return x.Name
 	}
@@ -222,28 +222,28 @@ func (x *TenantUserLevelKycResp) GetTenantUserLevelKycStatus() StatusInfo {
 	return StatusInfo_Pending
 }
 
-type TenantLevelKCResp struct {
+type TenantLevelKycResp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// TenantLevelKC Status for tenant
-	TenantLevelKCStatus StatusInfo `protobuf:"varint,1,opt,name=TenantLevelKCStatus,proto3,enum=config.StatusInfo" json:"TenantLevelKCStatus,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// TenantLevelKyc Status for tenant
+	TenantLevelKycStatus StatusInfo `protobuf:"varint,1,opt,name=TenantLevelKycStatus,proto3,enum=config.StatusInfo" json:"TenantLevelKycStatus,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
-func (x *TenantLevelKCResp) Reset() {
-	*x = TenantLevelKCResp{}
+func (x *TenantLevelKycResp) Reset() {
+	*x = TenantLevelKycResp{}
 	mi := &file_kyc_kyb_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *TenantLevelKCResp) String() string {
+func (x *TenantLevelKycResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*TenantLevelKCResp) ProtoMessage() {}
+func (*TenantLevelKycResp) ProtoMessage() {}
 
-func (x *TenantLevelKCResp) ProtoReflect() protoreflect.Message {
+func (x *TenantLevelKycResp) ProtoReflect() protoreflect.Message {
 	mi := &file_kyc_kyb_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -255,14 +255,14 @@ func (x *TenantLevelKCResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use TenantLevelKCResp.ProtoReflect.Descriptor instead.
-func (*TenantLevelKCResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use TenantLevelKycResp.ProtoReflect.Descriptor instead.
+func (*TenantLevelKycResp) Descriptor() ([]byte, []int) {
 	return file_kyc_kyb_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *TenantLevelKCResp) GetTenantLevelKCStatus() StatusInfo {
+func (x *TenantLevelKycResp) GetTenantLevelKycStatus() StatusInfo {
 	if x != nil {
-		return x.TenantLevelKCStatus
+		return x.TenantLevelKycStatus
 	}
 	return StatusInfo_Pending
 }
@@ -273,13 +273,13 @@ const file_kyc_kyb_proto_rawDesc = "" +
 	"\n" +
 	"\rkyc_kyb.proto\x12\x06config\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\".\n" +
 	"\x18TenantUserLevelKycGetReq\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\")\n" +
-	"\x13TenantLevelKCGetReq\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\"*\n" +
+	"\x14TenantLevelKycGetReq\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\"h\n" +
 	"\x16TenantUserLevelKycResp\x12N\n" +
-	"\x18TenantUserLevelKycStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\x18TenantUserLevelKycStatus\"Y\n" +
-	"\x11TenantLevelKCResp\x12D\n" +
-	"\x13TenantLevelKCStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\x13TenantLevelKCStatus*e\n" +
+	"\x18TenantUserLevelKycStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\x18TenantUserLevelKycStatus\"\\\n" +
+	"\x12TenantLevelKycResp\x12F\n" +
+	"\x14TenantLevelKycStatus\x18\x01 \x01(\x0e2\x12.config.StatusInfoR\x14TenantLevelKycStatus*e\n" +
 	"\n" +
 	"StatusInfo\x12\v\n" +
 	"\aPending\x10\x00\x12\r\n" +
@@ -291,9 +291,9 @@ const file_kyc_kyb_proto_rawDesc = "" +
 	"\x14ReVerificationNeeded\x10\x052\xa8\x02\n" +
 	"\x10TenantManagement\x12\x8e\x01\n" +
 	"\x1bGetTenantUserLevelKycStatus\x12 .config.TenantUserLevelKycGetReq\x1a\x1e.config.TenantUserLevelKycResp\"-\x82\xd3\xe4\x93\x02'\x12%/v1/api/tenant-mgmt/tenant/{name}/kyc\x12\x82\x01\n" +
-	"\x16GetTenantLevelKCStatus\x12\x1b.config.TenantLevelKCGetReq\x1a\x19.config.TenantLevelKCResp\"0\x82\xd3\xe4\x93\x02*\x12(/v1/api/tenant-mgmt/v1/tenant/{name}/kybBu\x92A?\x12\x1c\n" +
-	"\x15TenantManagement API 2\x031.0r\x1f\n" +
-	"\x1dTenantManagement API, KYC_KYBZ1github.com/coredgeio/tenant-management/api/configb\x06proto3"
+	"\x17GetTenantLevelKycStatus\x12\x1c.config.TenantLevelKycGetReq\x1a\x1a.config.TenantLevelKycResp\"-\x82\xd3\xe4\x93\x02'\x12%/v1/api/tenant-mgmt/tenant/{name}/kybB\x8f\x01\x92AY\x12\x1c\n" +
+	"\x15TenantManagement API 2\x031.0r9\n" +
+	"7TenantManagement API, TenantUserLevelKYC-TenantLevelKYCZ1github.com/coredgeio/tenant-management/api/configb\x06proto3"
 
 var (
 	file_kyc_kyb_proto_rawDescOnce sync.Once
@@ -312,17 +312,17 @@ var file_kyc_kyb_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_kyc_kyb_proto_goTypes = []any{
 	(StatusInfo)(0),                  // 0: config.StatusInfo
 	(*TenantUserLevelKycGetReq)(nil), // 1: config.TenantUserLevelKycGetReq
-	(*TenantLevelKCGetReq)(nil),      // 2: config.TenantLevelKCGetReq
+	(*TenantLevelKycGetReq)(nil),     // 2: config.TenantLevelKycGetReq
 	(*TenantUserLevelKycResp)(nil),   // 3: config.TenantUserLevelKycResp
-	(*TenantLevelKCResp)(nil),        // 4: config.TenantLevelKCResp
+	(*TenantLevelKycResp)(nil),       // 4: config.TenantLevelKycResp
 }
 var file_kyc_kyb_proto_depIdxs = []int32{
 	0, // 0: config.TenantUserLevelKycResp.TenantUserLevelKycStatus:type_name -> config.StatusInfo
-	0, // 1: config.TenantLevelKCResp.TenantLevelKCStatus:type_name -> config.StatusInfo
+	0, // 1: config.TenantLevelKycResp.TenantLevelKycStatus:type_name -> config.StatusInfo
 	1, // 2: config.TenantManagement.GetTenantUserLevelKycStatus:input_type -> config.TenantUserLevelKycGetReq
-	2, // 3: config.TenantManagement.GetTenantLevelKCStatus:input_type -> config.TenantLevelKCGetReq
+	2, // 3: config.TenantManagement.GetTenantLevelKycStatus:input_type -> config.TenantLevelKycGetReq
 	3, // 4: config.TenantManagement.GetTenantUserLevelKycStatus:output_type -> config.TenantUserLevelKycResp
-	4, // 5: config.TenantManagement.GetTenantLevelKCStatus:output_type -> config.TenantLevelKCResp
+	4, // 5: config.TenantManagement.GetTenantLevelKycStatus:output_type -> config.TenantLevelKycResp
 	4, // [4:6] is the sub-list for method output_type
 	2, // [2:4] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
