@@ -24,6 +24,7 @@ import (
 	"github.com/coredgeio/tenant-management/pkg/paymentconfigured"
 	"github.com/coredgeio/tenant-management/pkg/server"
 	tenantkyc "github.com/coredgeio/tenant-management/pkg/tenantkyc"
+	"github.com/coredgeio/tenant-management/pkg/tenanttype"
 )
 
 const (
@@ -102,12 +103,20 @@ func main() {
 		_ = tenantkyc.CreateKybManager()
 	}
 
-	// start the manager for KYB
+	// start the manager for Payment Configuration
 	if config.GetPaymentMethodConfigurationEnabled() {
 		log.Println("Starting Payment Configuration manager...")
 		// call tenant level manager which is working on notification from tenant collections
 		// and updating the Payment Configuration status at the tenant level collection
 		_ = paymentconfigured.CreatePaymentConfiguredManager()
+	}
+
+	// start the manager for Tenant Type
+	if config.GetTenantTypeEnabled() {
+		log.Println("Starting Tenant type manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Tenant Type status at the tenant level collection
+		_ = tenanttype.CreateTenantTypeManager()
 	}
 
 	var opts []grpc.ServerOption

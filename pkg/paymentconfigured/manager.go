@@ -72,6 +72,8 @@ func (r *PaymentConfiguredReconciler) Reconcile(rkey interface{}) (*notifier.Res
 			// Set headers
 			req.Header.Set("Content-Type", r.mgr.contentTypeHeader)
 			req.Header.Set("Authorization", r.mgr.authorizationHeader)
+			req.Header.Set("apiKey", r.mgr.apiKey)
+
 			// Send the request
 			resp, err := client.Do(req)
 			if err != nil {
@@ -150,6 +152,7 @@ type PaymentConfiguredManager struct {
 	contentTypeHeader   string
 	authorizationHeader string
 	clientName          string
+	apiKey              string
 	mu                  sync.Mutex
 }
 
@@ -178,6 +181,7 @@ func CreatePaymentConfiguredManager() *PaymentConfiguredManager {
 		httpMethod:          cfg.GetPaymentMethodConfigurationHttpMethod(),
 		contentTypeHeader:   cfg.GetPaymentMethodConfigurationContentType(),
 		authorizationHeader: cfg.GetPaymentMethodConfigurationAuthorization(),
+		apiKey:              cfg.GetPaymentMethodConfigurationApiKey(),
 		mu:                  sync.Mutex{},
 	}
 	manager.InitImplWithTerminateHandling(manager)

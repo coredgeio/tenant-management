@@ -15,5 +15,5 @@ type Provider interface {
 	GetPaymentConfiguredStatus(body []byte) (bool, error)
 
 	// this function returns information on basis of whether tenant type has been set or not for a tenant
-	GetTenantType(body []byte) (string, error)
+	GetTenantType(body []byte) (tenant.TenantType, error)
 }

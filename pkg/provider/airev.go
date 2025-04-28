@@ -70,7 +70,19 @@ func (a *AiRev) GetPaymentConfiguredStatus(body []byte) (bool, error) {
 	return resp.Data.PaymentDetails.PaymentMethodAvailable, nil
 }
 
-func (a *AiRev) GetTenantType(body []byte) (string, error) {
+func (a *AiRev) GetTenantType(body []byte) (tenant.TenantType, error) {
 
-	return "", nil
+	var resp GenericResponse
+	err := json.Unmarshal(body, &resp)
+	if err != nil {
+		log.Printf("Error while unmarshaling response for KYB in AiRev, error: %s\n", err)
+		return 100, err
+	}
+	tenantType := resp.Data.AccountType
+	switch tenantType {
+	case "INDIVIDUAL":
+		return tenant.Individual, nil
+	default:
+		return tenant.Organisation, nil
+	}
 }
