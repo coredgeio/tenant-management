@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.8
 
 require (
-	github.com/coredgeio/compass v0.0.0-20250416125353-c6e784e38c05
+	github.com/coredgeio/compass v0.0.0-20250425092526-a1728aeacf8f
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb
 	google.golang.org/grpc v1.71.1
@@ -37,7 +37,7 @@ require (
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coredgeio/compass-geolocation v0.0.0-20231106060700-b7460f109b8e // indirect
 	github.com/coredgeio/gosdkclient v0.0.0-20240720174731-b9ed71d8f68b // indirect
-	github.com/coredgeio/orbiter-auth v0.0.0-20250417082519-056c06edfe42 // indirect
+	github.com/coredgeio/orbiter-auth v0.0.0-20250429093620-b760a2b5c885 // indirect
 	github.com/coreos/go-oidc/v3 v3.1.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

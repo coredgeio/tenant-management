@@ -17,6 +17,7 @@ import (
 	tenantruntime "github.com/coredgeio/compass/controller/pkg/runtime/tenant"
 	"github.com/coredgeio/compass/pkg/auth"
 	"github.com/coredgeio/compass/pkg/infra/configdb"
+	"github.com/coredgeio/orbiter-auth/pkg/runtime/tenantuser"
 
 	apiConfig "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
@@ -25,6 +26,7 @@ import (
 	"github.com/coredgeio/tenant-management/pkg/server"
 	tenantkyc "github.com/coredgeio/tenant-management/pkg/tenantkyc"
 	"github.com/coredgeio/tenant-management/pkg/tenanttype"
+	"github.com/coredgeio/tenant-management/pkg/tenantuserkyc"
 )
 
 const (
@@ -94,13 +96,21 @@ func main() {
 		log.Fatalln("unable to locate or create tenant config table")
 	}
 
+	_, err = tenantuser.LocateTenantUserTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create tenant user table")
+	}
+
 	// start the manager for tenant Level KYC
 	if config.GetTenantLevelKYCEnabled() {
 		log.Println("Starting Tenant Level KYC manager...")
 		// call tenant level manager which is working on notification from tenant collections
 		// and updating the KYC status at the tenant level collection
 		// create tenant role manager
-		_ = tenantkyc.CreateKybManager()
+		go func() {
+			log.Println("Config file path 0: ", cfgPath)
+			_ = tenantkyc.CreateKybManager()
+		}()
 	}
 
 	// start the manager for Payment Configuration
@@ -108,7 +118,10 @@ func main() {
 		log.Println("Starting Payment Configuration manager...")
 		// call tenant level manager which is working on notification from tenant collections
 		// and updating the Payment Configuration status at the tenant level collection
-		_ = paymentconfigured.CreatePaymentConfiguredManager()
+		go func() {
+			log.Println("Config file path 0: ", cfgPath)
+			_ = paymentconfigured.CreatePaymentConfiguredManager()
+		}()
 	}
 
 	// start the manager for Tenant Type
@@ -116,7 +129,20 @@ func main() {
 		log.Println("Starting Tenant type manager...")
 		// call tenant level manager which is working on notification from tenant collections
 		// and updating the Tenant Type status at the tenant level collection
-		_ = tenanttype.CreateTenantTypeManager()
+		go func() {
+			log.Println("Config file path 0: ", cfgPath)
+			_ = tenanttype.CreateTenantTypeManager()
+		}()
+	}
+
+	// start the manager for Tenant Type
+	if config.GetTenantUserLevelKYCEnabled() {
+		log.Println("Starting Tenant user level kyc manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Tenant Type status at the tenant level collection
+		go func() {
+			_ = tenantuserkyc.CreateTenantUserLevelKycManager()
+		}()
 	}
 
 	var opts []grpc.ServerOption
