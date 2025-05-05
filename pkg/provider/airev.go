@@ -29,6 +29,21 @@ type KYBData struct {
 	Status string `json:"status"`
 }
 
+type TenantUserKycResponse struct {
+	Message string            `json:"message"`
+	Data    TenantUserKycData `json:"data"`
+}
+
+type TenantUserKycData struct {
+	TenantId   string              `json:"tenantId"`
+	Email      string              `json:"email"`
+	KYCDetails TenantUserKYCStatus `json:"kyc"`
+}
+
+type TenantUserKYCStatus struct {
+	Status string `json:"status"`
+}
+
 type PaymentData struct {
 	PaymentMethodAvailable bool `json:"paymentMethodAvailable"`
 }
@@ -55,9 +70,27 @@ func (a *AiRev) GetTenantLevelKycStatus(body []byte) (tenant.KYCStatus, error) {
 	}
 }
 
-func (a *AiRev) GetKycStatus(body []byte) (tenant.KYCStatus, error) {
+func (a *AiRev) GetTenantUserLevelKycStatus(body []byte) (tenant.KYCStatus, error) {
 
-	return tenant.KYCDone, nil
+	var resp TenantUserKycResponse
+	err := json.Unmarshal(body, &resp)
+	if err != nil {
+		log.Printf("Error while unmarshaling response for KYB in AiRev, error: %s\n", err)
+		return 100, err
+	}
+	kycStatus := resp.Data.KYCDetails.Status
+	switch kycStatus {
+	case "PENDING":
+		return tenant.KYCPending, nil
+	case "ATTEMPTED":
+		return tenant.KYCPending, nil
+	case "REJECTED":
+		return tenant.KYCFailed, nil
+	case "FAILED":
+		return tenant.KYCFailed, nil
+	default:
+		return tenant.KYCDone, nil
+	}
 }
 
 func (a *AiRev) GetPaymentConfiguredStatus(body []byte) (bool, error) {

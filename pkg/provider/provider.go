@@ -9,7 +9,7 @@ type Provider interface {
 	GetTenantLevelKycStatus(body []byte) (tenant.KYCStatus, error)
 
 	// this function returns information on basis of whether KYC is done or not for a tenant user
-	GetKycStatus(body []byte) (tenant.KYCStatus, error)
+	GetTenantUserLevelKycStatus(body []byte) (tenant.KYCStatus, error)
 
 	// this function returns information on basis of whether tenant has configured a payment method or not for a tenant
 	GetPaymentConfiguredStatus(body []byte) (bool, error)
