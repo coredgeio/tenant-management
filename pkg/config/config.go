@@ -49,6 +49,36 @@ type configType struct {
 			} `yaml:"defaultHeaders"`
 		} `yaml:"requestDetails"`
 	} `yaml:"paymentConfigurationForTenant"`
+	TenantType struct {
+		Enabled           bool   `yaml:"enabled"`
+		ServerPath        string `yaml:"serverPath"`
+		PollingTime       int    `yaml:"pollingTime"`
+		StopUpdateOnceSet bool   `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"tenantType"`
+	TenantUserLevelKYC struct {
+		Enabled           bool   `yaml:"enabled"`
+		ServerPath        string `yaml:"serverPath"`
+		PollingTime       int    `yaml:"pollingTime"`
+		StopUpdateOnceSet bool   `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"tenantUserLevelKyc"`
 }
 
 var config configType
@@ -118,6 +148,11 @@ func GetTenantLevelKYCContentType() string {
 	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.ContentType
 }
 
+// GetTenantLevelKYCApiKey returns the apiKey header value
+func GetTenantLevelKYCApiKey() string {
+	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.Apikey
+}
+
 // GetPaymentMethodConfigurationEnabled returns configured Payment Configuration enabled
 func GetPaymentMethodConfigurationEnabled() bool {
 	return config.PaymentConfigurationForTenant.Enabled
@@ -156,6 +191,101 @@ func GetPaymentMethodConfigurationAuthorization() string {
 // GetPaymentMethodConfigurationContentType returns the Content-Type header value
 func GetPaymentMethodConfigurationContentType() string {
 	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetPaymentMethodConfigurationApiKey returns the apiKey header value
+func GetPaymentMethodConfigurationApiKey() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.Apikey
+}
+
+// GetTenantTypeEnabled returns configured Payment Configuration enabled
+func GetTenantTypeEnabled() bool {
+	return config.TenantType.Enabled
+}
+
+// GetTenantTypeServerPath returns configured payment configuration server path
+func GetTenantTypeServerPath() string {
+	return config.TenantType.ServerPath
+}
+
+// GetTenantTypePollingTime returns configured Payment configuration polling time
+func GetTenantTypePollingTime() int {
+	return config.TenantType.PollingTime
+}
+
+// GetTenantTypeStopUpdateOnceSet returns configured Payment Configuration stop update once set
+func GetTenantTypeStopUpdateOnceSet() bool {
+	return config.TenantType.StopUpdateOnceSet
+}
+
+// GetTenantTypeBaseUrl returns the base URL
+func GetTenantTypeBaseUrl() string {
+	return config.TenantType.RequestDetails.BaseUrl
+}
+
+// GetTenantTypeHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetTenantTypeHttpMethod() string {
+	return config.TenantType.RequestDetails.HttpMethod
+}
+
+// GetTenantTypeAuthorization returns the Authorization header value
+func GetTenantTypeAuthorization() string {
+	return config.TenantType.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetTenantTypeContentType returns the Content-Type header value
+func GetTenantTypeContentType() string {
+	return config.TenantType.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetTenantTypeApiKey returns the apiKey header value
+func GetTenantTypeApiKey() string {
+	return config.TenantType.RequestDetails.DefaultHeaders.Apikey
+}
+
+// GetTenantUserLevelKycEnabled returns configured Payment Configuration enabled
+func GetTenantUserLevelKYCEnabled() bool {
+	return config.TenantUserLevelKYC.Enabled
+}
+
+// GetTenantUserLevelKYCServerPath returns configured payment configuration server path
+func GetTenantUserLevelKYCServerPath() string {
+	return config.TenantUserLevelKYC.ServerPath
+}
+
+// GetTenantUserLevelKYCPollingTime returns configured Payment configuration polling time
+func GetTenantUserLevelKYCPollingTime() int {
+	return config.TenantUserLevelKYC.PollingTime
+}
+
+// GetTenantUserLevelKYCStopUpdateOnceSet returns configured Payment Configuration stop update once set
+func GetTenantUserLevelKYCStopUpdateOnceSet() bool {
+	return config.TenantUserLevelKYC.StopUpdateOnceSet
+}
+
+// GetTenantUserLevelKYCBaseUrl returns the base URL
+func GetTenantUserLevelKYCBaseUrl() string {
+	return config.TenantUserLevelKYC.RequestDetails.BaseUrl
+}
+
+// GetTenantUserLevelKYCHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetTenantUserLevelKYCHttpMethod() string {
+	return config.TenantUserLevelKYC.RequestDetails.HttpMethod
+}
+
+// GetTenantUserLevelKYCAuthorization returns the Authorization header value
+func GetTenantUserLevelKYCAuthorization() string {
+	return config.TenantUserLevelKYC.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetTenantUserLevelKYCContentType returns the Content-Type header value
+func GetTenantUserLevelKYCContentType() string {
+	return config.TenantUserLevelKYC.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetTenantUserLevelKYCApiKey returns the apiKey header value
+func GetTenantUserLevelKYCApiKey() string {
+	return config.TenantUserLevelKYC.RequestDetails.DefaultHeaders.Apikey
 }
 
 // validateConfigPath just makes sure, that the path provided is a file,
