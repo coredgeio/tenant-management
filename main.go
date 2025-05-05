@@ -17,11 +17,17 @@ import (
 	tenantruntime "github.com/coredgeio/compass/controller/pkg/runtime/tenant"
 	"github.com/coredgeio/compass/pkg/auth"
 	"github.com/coredgeio/compass/pkg/infra/configdb"
+	"github.com/coredgeio/orbiter-auth/pkg/runtime/tenantuser"
+	"github.com/coredgeio/orbiter-baremetal-manager/pkg/runtime/bms"
 
 	apiConfig "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
 	"github.com/coredgeio/tenant-management/pkg/config"
+	"github.com/coredgeio/tenant-management/pkg/provider"
+	"github.com/coredgeio/tenant-management/pkg/publishmeteringinfo"
 	"github.com/coredgeio/tenant-management/pkg/server"
+	tenant "github.com/coredgeio/tenant-management/pkg/tenant"
+	tuser "github.com/coredgeio/tenant-management/pkg/tenantuser"
 )
 
 const (
@@ -86,17 +92,62 @@ func main() {
 		log.Fatalln("Exiting...")
 	}
 
+	// locating/initializing tenants collection
 	_, err = tenantruntime.NewTenantConfigTable()
 	if err != nil {
 		log.Fatalln("unable to locate or create tenant config table")
 	}
 
-	// start the manager for KYB
-	if config.GetTenantLevelKYCEnabled() {
-		log.Println("Starting Tenant Level KYC manager...")
-		// call tenant level manager which is working on notification from tenant collections
-		// and updating the KYC status at the tenant level collection
+	// locating/initializing tenant-users collection
+	_, err = tenantuser.LocateTenantUserTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create tenant user table")
+	}
 
+	// locating/initializing baremetal-servers collection
+	_, err = bms.LocateBareMetalServerTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create bare metal server table")
+	}
+
+	// setting provider type
+	var prvder provider.Provider
+	switch config.GetClientName() {
+	case "core42":
+		prv := &provider.AiRev{
+			ClientName: config.GetClientName(),
+		}
+		prvder = prv
+	}
+
+	// start the manager for tenant Level metatdata
+	if config.GetTenantMetadataEnabled() {
+		log.Println("Starting Tenant metadata manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the  tenant metadata at the tenant level collection
+		go func() {
+			_ = tenant.CreateTenantMetadataManager(prvder)
+		}()
+	}
+
+	// start the manager for Tenant Type
+	if config.GetTenantUserMetadataEnabled() {
+		log.Println("Starting Tenant user level kyc manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Tenant Type status at the tenant-user collection
+		go func() {
+			_ = tuser.CreateTenantUserKycManager(prvder)
+		}()
+	}
+
+	// start the manager for publishing metering data
+	if config.GetPublishMeteringInfoEnabled() {
+		log.Println("Starting Publish Metering Info manager...")
+		// call publish metering info manager which is working on notification from events collections
+		// and sending data to third party to send to start metering
+		go func() {
+			_ = publishmeteringinfo.CreatePublishMeteringInfoManager(prvder)
+		}()
 	}
 
 	var opts []grpc.ServerOption

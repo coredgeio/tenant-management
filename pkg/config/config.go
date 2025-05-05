@@ -7,6 +7,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type DefaultHeaders struct {
+	Authorization string `yaml:"authorization"`
+	ContentType   string `yaml:"contentType"`
+	Apikey        string `yaml:"apikey"`
+}
+
+type EndpointDetails struct {
+	BaseUrl        string         `yaml:"baseUrl"`
+	HttpMethod     string         `yaml:"httpMethod"`
+	DefaultHeaders DefaultHeaders `yaml:"defaultHeaders"`
+}
+
 type configType struct {
 	MongoDB struct {
 		Host string `yaml:"host"`
@@ -19,20 +31,23 @@ type configType struct {
 	Client struct {
 		Name string `yaml:"name"`
 	} `yaml:"client"`
-	TenantLevelKYC struct {
-		Enabled           bool   `yaml:"enabled"`
-		ServerPath        string `yaml:"serverPath"`
-		PollingTime       int    `yaml:"pollingTime"`
-		StopUpdateOnceSet bool   `yaml:"stopUpdateOnceSet"`
-		RequestDetails    struct {
-			BaseUrl        string `yaml:"baseUrl"`
-			HttpMethod     string `yaml:"httpMethod"`
-			DefaultHeaders struct {
-				Authorization string `yaml:"authorization"`
-				ContentType   string `yaml:"contentType"`
-			} `yaml:"defaultHeaders"`
-		} `yaml:"requestDetails"`
-	} `yaml:"tenantLevelKyc"`
+	PollingTime    int `yaml:"pollingTime"`
+	TenantMetadata struct {
+		Enabled bool `yaml:"enabled"`
+		// this field makes sure that we stop polling once we have received our desired response if set to true
+		StopUpdateOnceSet bool            `yaml:"stopUpdateOnceSet"`
+		EndpointDetails   EndpointDetails `yaml:"requestDetails"`
+	} `yaml:"tenantMetadata"`
+	TenantUserMetadata struct {
+		Enabled bool `yaml:"enabled"`
+		// this field makes sure that we stop polling once we have received our desired response if set to true
+		StopUpdateOnceSet bool            `yaml:"stopUpdateOnceSet"`
+		EndpointDetails   EndpointDetails `yaml:"requestDetails"`
+	} `yaml:"tenantUserMetadata"`
+	PublishMeteringInfo struct {
+		Enabled         bool            `yaml:"enabled"`
+		EndpointDetails EndpointDetails `yaml:"requestDetails"`
+	} `yaml:"publishMeteringInfo"`
 }
 
 var config configType
@@ -62,44 +77,49 @@ func GetClientName() string {
 	return config.Client.Name
 }
 
-// GetTenantLevelKYCEnabled returns configured TenantLevelKYC enabled
-func GetTenantLevelKYCEnabled() bool {
-	return config.TenantLevelKYC.Enabled
+// GetPollingTime returns configured polling time
+func GetPollingTime() int {
+	return config.PollingTime
 }
 
-// GetTenantLevelKYCServerPath returns configured TenantLevelKYC server path
-func GetTenantLevelKYCServerPath() string {
-	return config.TenantLevelKYC.ServerPath
+// GetTenantMetadataEnabled returns if tenant metadata is enabled
+func GetTenantMetadataEnabled() bool {
+	return config.TenantMetadata.Enabled
 }
 
-// GetTenantLevelKYCPollingTime returns configured TenantLevelKYC polling time
-func GetTenantLevelKYCPollingTime() int {
-	return config.TenantLevelKYC.PollingTime
+// GetTenantMetadataStopUpdateOnceSet returns if tenant metadata update should stop once set
+func GetTenantMetadataStopUpdateOnceSet() bool {
+	return config.TenantMetadata.StopUpdateOnceSet
 }
 
-// GetTenantLevelKYCStopUpdateOnceSet returns configured TenantLevelKYC stop update once set
-func GetTenantLevelKYCStopUpdateOnceSet() bool {
-	return config.TenantLevelKYC.StopUpdateOnceSet
+// GetTenantMetadataEndpointDetails returns tenant metadata endpoint details
+func GetTenantMetadataEndpointDetails() EndpointDetails {
+	return config.TenantMetadata.EndpointDetails
 }
 
-// GetBaseUrl returns the base URL
-func GetTenantLevelKYCBaseUrl() string {
-	return config.TenantLevelKYC.RequestDetails.BaseUrl
+// GetTenantUserMetadataEnabled returns if tenant user metadata is enabled
+func GetTenantUserMetadataEnabled() bool {
+	return config.TenantUserMetadata.Enabled
 }
 
-// GetHttpMethod returns the HTTP method (GET, POST, etc.)
-func GetTenantLevelKYCHttpMethod() string {
-	return config.TenantLevelKYC.RequestDetails.HttpMethod
+// GetTenantUserMetadataStopUpdateOnceSet returns if tenant user metadata update should stop once set
+func GetTenantUserMetadataStopUpdateOnceSet() bool {
+	return config.TenantUserMetadata.StopUpdateOnceSet
 }
 
-// GetAuthorization returns the Authorization header value
-func GetTenantLevelKYCAuthorization() string {
-	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.Authorization
+// GetTenantUserMetadataEndpointDetails returns tenant user metadata endpoint details
+func GetTenantUserMetadataEndpointDetails() EndpointDetails {
+	return config.TenantUserMetadata.EndpointDetails
 }
 
-// GetContentType returns the Content-Type header value
-func GetTenantLevelKYCContentType() string {
-	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.ContentType
+// GetPublishMeteringInfoEnabled returns if publish metering info is enabled
+func GetPublishMeteringInfoEnabled() bool {
+	return config.PublishMeteringInfo.Enabled
+}
+
+// GetPublishMeteringInfoEndpointDetails returns publish metering info endpoint details
+func GetPublishMeteringInfoEndpointDetails() EndpointDetails {
+	return config.PublishMeteringInfo.EndpointDetails
 }
 
 // validateConfigPath just makes sure, that the path provided is a file,
