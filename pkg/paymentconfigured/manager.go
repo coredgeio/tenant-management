@@ -1,4 +1,4 @@
-package tenantkyc
+package paymentconfigured
 
 import (
 	"io"
@@ -10,6 +10,7 @@ import (
 	pkgerrors "github.com/coredgeio/compass/pkg/errors"
 	inframanager "github.com/coredgeio/compass/pkg/infra/manager"
 	"github.com/coredgeio/compass/pkg/infra/notifier"
+	"github.com/coredgeio/compass/pkg/utils"
 
 	cfg "github.com/coredgeio/tenant-management/pkg/config"
 	"github.com/coredgeio/tenant-management/pkg/httpclient"
@@ -18,20 +19,19 @@ import (
 
 const (
 	// reconciler client for tenant table
-	TenantKybManagerClientName = "TenantKybManager"
+	PaymentConfiguredClientName = "PaymentConfiguredManager"
 )
 
-type TenantKybReconciler struct {
+type PaymentConfiguredReconciler struct {
 	notifier.Client
-	mgr *KybManager
+	mgr *PaymentConfiguredManager
 }
 
-func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, error) {
+func (r *PaymentConfiguredReconciler) Reconcile(rkey interface{}) (*notifier.Result, error) {
 	key, ok := rkey.(tenant.TenantConfigKey)
 	if !ok {
 		log.Fatalln("Received key not of type domain config key in domain config manager: ", rkey)
 	}
-	log.Printf("TenantKybReconciler: Received key: %s\n", key)
 
 	// check if manager lock is acquired
 	if !r.mgr.IsOwnershipAcquired() {
@@ -49,12 +49,11 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 		log.Println("Something unexpected went wrong,retrying again")
 		return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 	}
-	log.Printf("TenantKybReconciler: Entry fetched: %v\n", entry)
 
 	// check if the entry already has kyc value set
-	if entry.Kyc == nil {
+	if entry.PaymentConfigured == nil {
 
-		log.Printf("KYC value not set for entry %s, fetching information from Tenant Level KYC server\n", key.Name)
+		log.Printf("Payment configured value not set for entry %s, fetching information from Tenant config collection\n", key.Name)
 		for {
 			// Add a sleep interval to prevent 100% CPU usage
 			time.Sleep(time.Duration(r.mgr.interval) * time.Second)
@@ -62,8 +61,6 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 			// need to make an http call to fetch the value from db
 			// getting client from package
 			client := httpclient.GetClient()
-			log.Printf("TenantKybReconciler: Client : %v\n", client)
-
 			// making a request to the server
 			// update the URL as per your requirement
 			// for now not making it generic and will be making use of hardcoded values and appending at the end
@@ -74,8 +71,6 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 				log.Printf("Something unexpected went wrong while creating request,retrying again, error: %s\n", err)
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
-			log.Printf("TenantKybReconciler: Request created: %v\n", req)
-
 			// Set headers
 			if r.mgr.contentTypeHeader != "" {
 				req.Header.Set("Content-Type", r.mgr.contentTypeHeader)
@@ -95,8 +90,6 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
 			defer resp.Body.Close()
-			log.Printf("TenantKybReconciler: Response received: %v\n", resp)
-
 			// Read the response body
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -104,44 +97,39 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 				log.Printf("Something unexpected went wrong while reading response,retrying again, error: %s\n", err)
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
-			log.Printf("TenantKybReconciler: Body received: %v\n", body)
-
 			// Print the response for now, once APIs are provided this will be sent to specific package
 			log.Println("Response status:", resp.Status)
 			log.Println("Response body:", string(body))
 
 			// convert the response into provider specific struct and fetch kyb specific data
 			// on basis of client name
+			var paymentConfiguredStatus bool
+			var paymentConfiguredStatusErr error
+			paymentConfiguredStatus, paymentConfiguredStatusErr = r.mgr.prv.GetPaymentConfiguredStatus(body)
 
-			var kybStatus tenant.KYCStatus
-			var kycErr error
-			kybStatus, kycErr = r.mgr.prv.GetTenantLevelKycStatus(body)
-			if kycErr != nil {
+			if paymentConfiguredStatusErr != nil {
 				// something unexpected happened and we will retry after 5 seconds from the start
-				log.Printf("Something unexpected went wrong while fetching kyb status from API,retrying again, error: %s\n", err)
+				log.Printf("Something unexpected went wrong while fetching payment configured status from API,retrying again, error: %s\n", err)
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
 
 			// once value is fetched, need to set value in tenants collection
-			// only setting value in case KYC was done successfully else keeping it as it is
-			if kybStatus == tenant.KYCDone {
+			if paymentConfiguredStatus {
 				// updating information in tenants collection
 				update := &tenant.TenantConfig{
-					Key: key,
-					Kyc: &tenant.TenantKyc{
-						Status: kybStatus,
-					},
+					Key:               key,
+					PaymentConfigured: utils.BoolP(paymentConfiguredStatus),
 				}
 				err := r.mgr.tenantConfTable.Update(update)
 				if err != nil {
 					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while updating kyb status in tenant config collection,retrying again, error: %s\n", err)
+					log.Printf("Something unexpected went wrong while updating payment configured status in tenant config collection, retrying again, error: %s\n", err)
 					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 				}
 			}
 
 			// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
-			if (kybStatus == tenant.KYCDone) && r.mgr.stopOnceSet {
+			if paymentConfiguredStatus && r.mgr.stopOnceSet {
 				break
 			}
 		}
@@ -151,7 +139,7 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 	return &notifier.Result{}, nil
 }
 
-type KybManager struct {
+type PaymentConfiguredManager struct {
 	inframanager.ManagerImpl
 	tenantConfTable     *tenant.TenantConfigTable
 	interval            int
@@ -161,37 +149,36 @@ type KybManager struct {
 	httpMethod          string
 	contentTypeHeader   string
 	authorizationHeader string
-	clientName          string
 	apiKey              string
 	prv                 provider.Provider
 }
 
-func (m *KybManager) Start() {
-	r := &TenantKybReconciler{mgr: m}
-	err := m.tenantConfTable.RegisterClient(TenantKybManagerClientName, r)
+func (m *PaymentConfiguredManager) Start() {
+	r := &PaymentConfiguredReconciler{mgr: m}
+	err := m.tenantConfTable.RegisterClient(PaymentConfiguredClientName, r)
 	if err != nil {
 		log.Fatalln("failed to register tenant conf while starting TenantManager", err)
 	}
 }
 
-func CreateKybManager(prvdr provider.Provider) *KybManager {
+func CreatePaymentConfiguredManager(prvdr provider.Provider) *PaymentConfiguredManager {
 
 	tenantCfgTbl, err := tenant.LocateTenantConfigTable()
 	if err != nil {
 		log.Fatalln("unable to locate tenant config table:", err)
 	}
-	manager := &KybManager{
+	manager := &PaymentConfiguredManager{
 		ManagerImpl: inframanager.ManagerImpl{
-			InstanceKey: TenantKybManagerInstanceKey,
+			InstanceKey: PaymentConfiguredManagerInstanceKey,
 		},
 		tenantConfTable:     tenantCfgTbl,
-		interval:            cfg.GetTenantLevelKYCPollingTime(),
-		enabled:             cfg.GetTenantLevelKYCEnabled(),
-		baseUrl:             cfg.GetTenantLevelKYCBaseUrl(),
-		httpMethod:          cfg.GetTenantLevelKYCHttpMethod(),
-		contentTypeHeader:   cfg.GetTenantLevelKYCContentType(),
-		authorizationHeader: cfg.GetTenantLevelKYCAuthorization(),
-		apiKey:              cfg.GetTenantLevelKYCApiKey(),
+		interval:            cfg.GetPaymentMethodConfigurationPollingTime(),
+		enabled:             cfg.GetPaymentMethodConfigurationEnabled(),
+		baseUrl:             cfg.GetPaymentMethodConfigurationBaseUrl(),
+		httpMethod:          cfg.GetPaymentMethodConfigurationHttpMethod(),
+		contentTypeHeader:   cfg.GetPaymentMethodConfigurationContentType(),
+		authorizationHeader: cfg.GetPaymentMethodConfigurationAuthorization(),
+		apiKey:              cfg.GetPaymentMethodConfigurationApiKey(),
 		prv:                 prvdr,
 	}
 	manager.InitImplWithTerminateHandling(manager)

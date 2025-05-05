@@ -1,4 +1,4 @@
-package tenantkyc
+package tenanttype
 
 import (
 	"io"
@@ -18,20 +18,19 @@ import (
 
 const (
 	// reconciler client for tenant table
-	TenantKybManagerClientName = "TenantKybManager"
+	TenantTypeManagerClientName = "TenantTypeManager"
 )
 
-type TenantKybReconciler struct {
+type TenantTypeReconciler struct {
 	notifier.Client
-	mgr *KybManager
+	mgr *TenantTypeManager
 }
 
-func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, error) {
+func (r *TenantTypeReconciler) Reconcile(rkey interface{}) (*notifier.Result, error) {
 	key, ok := rkey.(tenant.TenantConfigKey)
 	if !ok {
 		log.Fatalln("Received key not of type domain config key in domain config manager: ", rkey)
 	}
-	log.Printf("TenantKybReconciler: Received key: %s\n", key)
 
 	// check if manager lock is acquired
 	if !r.mgr.IsOwnershipAcquired() {
@@ -49,10 +48,9 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 		log.Println("Something unexpected went wrong,retrying again")
 		return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 	}
-	log.Printf("TenantKybReconciler: Entry fetched: %v\n", entry)
 
 	// check if the entry already has kyc value set
-	if entry.Kyc == nil {
+	if entry.TenantType == nil {
 
 		log.Printf("KYC value not set for entry %s, fetching information from Tenant Level KYC server\n", key.Name)
 		for {
@@ -62,7 +60,6 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 			// need to make an http call to fetch the value from db
 			// getting client from package
 			client := httpclient.GetClient()
-			log.Printf("TenantKybReconciler: Client : %v\n", client)
 
 			// making a request to the server
 			// update the URL as per your requirement
@@ -74,7 +71,6 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 				log.Printf("Something unexpected went wrong while creating request,retrying again, error: %s\n", err)
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
-			log.Printf("TenantKybReconciler: Request created: %v\n", req)
 
 			// Set headers
 			if r.mgr.contentTypeHeader != "" {
@@ -95,7 +91,6 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
 			defer resp.Body.Close()
-			log.Printf("TenantKybReconciler: Response received: %v\n", resp)
 
 			// Read the response body
 			body, err := io.ReadAll(resp.Body)
@@ -104,19 +99,18 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 				log.Printf("Something unexpected went wrong while reading response,retrying again, error: %s\n", err)
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
-			log.Printf("TenantKybReconciler: Body received: %v\n", body)
 
 			// Print the response for now, once APIs are provided this will be sent to specific package
 			log.Println("Response status:", resp.Status)
 			log.Println("Response body:", string(body))
 
-			// convert the response into provider specific struct and fetch kyb specific data
+			// convert the response into provider specific struct and fetch tenant type specific data
 			// on basis of client name
+			var tenantType tenant.TenantType
+			var tenantTypeErr error
+			tenantType, tenantTypeErr = r.mgr.prv.GetTenantType(body)
 
-			var kybStatus tenant.KYCStatus
-			var kycErr error
-			kybStatus, kycErr = r.mgr.prv.GetTenantLevelKycStatus(body)
-			if kycErr != nil {
+			if tenantTypeErr != nil {
 				// something unexpected happened and we will retry after 5 seconds from the start
 				log.Printf("Something unexpected went wrong while fetching kyb status from API,retrying again, error: %s\n", err)
 				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
@@ -124,24 +118,20 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 
 			// once value is fetched, need to set value in tenants collection
 			// only setting value in case KYC was done successfully else keeping it as it is
-			if kybStatus == tenant.KYCDone {
-				// updating information in tenants collection
-				update := &tenant.TenantConfig{
-					Key: key,
-					Kyc: &tenant.TenantKyc{
-						Status: kybStatus,
-					},
-				}
-				err := r.mgr.tenantConfTable.Update(update)
-				if err != nil {
-					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while updating kyb status in tenant config collection,retrying again, error: %s\n", err)
-					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-				}
+			// updating information in tenants collection
+			update := &tenant.TenantConfig{
+				Key:        key,
+				TenantType: &tenantType,
+			}
+			err = r.mgr.tenantConfTable.Update(update)
+			if err != nil {
+				// something unexpected happened and we will retry after 5 seconds from the start
+				log.Printf("Something unexpected went wrong while updating kyb status in tenant config collection,retrying again, error: %s\n", err)
+				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 			}
 
 			// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
-			if (kybStatus == tenant.KYCDone) && r.mgr.stopOnceSet {
+			if (tenantType == tenant.Individual || tenantType == tenant.Organisation) && r.mgr.stopOnceSet {
 				break
 			}
 		}
@@ -151,7 +141,7 @@ func (r *TenantKybReconciler) Reconcile(rkey interface{}) (*notifier.Result, err
 	return &notifier.Result{}, nil
 }
 
-type KybManager struct {
+type TenantTypeManager struct {
 	inframanager.ManagerImpl
 	tenantConfTable     *tenant.TenantConfigTable
 	interval            int
@@ -161,37 +151,36 @@ type KybManager struct {
 	httpMethod          string
 	contentTypeHeader   string
 	authorizationHeader string
-	clientName          string
 	apiKey              string
 	prv                 provider.Provider
 }
 
-func (m *KybManager) Start() {
-	r := &TenantKybReconciler{mgr: m}
-	err := m.tenantConfTable.RegisterClient(TenantKybManagerClientName, r)
+func (m *TenantTypeManager) Start() {
+	r := &TenantTypeReconciler{mgr: m}
+	err := m.tenantConfTable.RegisterClient(TenantTypeManagerClientName, r)
 	if err != nil {
 		log.Fatalln("failed to register tenant conf while starting TenantManager", err)
 	}
 }
 
-func CreateKybManager(prvdr provider.Provider) *KybManager {
+func CreateTenantTypeManager(prvdr provider.Provider) *TenantTypeManager {
 
 	tenantCfgTbl, err := tenant.LocateTenantConfigTable()
 	if err != nil {
 		log.Fatalln("unable to locate tenant config table:", err)
 	}
-	manager := &KybManager{
+	manager := &TenantTypeManager{
 		ManagerImpl: inframanager.ManagerImpl{
-			InstanceKey: TenantKybManagerInstanceKey,
+			InstanceKey: TenantTypeManagerInstanceKey,
 		},
 		tenantConfTable:     tenantCfgTbl,
-		interval:            cfg.GetTenantLevelKYCPollingTime(),
-		enabled:             cfg.GetTenantLevelKYCEnabled(),
-		baseUrl:             cfg.GetTenantLevelKYCBaseUrl(),
-		httpMethod:          cfg.GetTenantLevelKYCHttpMethod(),
-		contentTypeHeader:   cfg.GetTenantLevelKYCContentType(),
-		authorizationHeader: cfg.GetTenantLevelKYCAuthorization(),
-		apiKey:              cfg.GetTenantLevelKYCApiKey(),
+		interval:            cfg.GetTenantTypePollingTime(),
+		enabled:             cfg.GetTenantTypeEnabled(),
+		baseUrl:             cfg.GetTenantTypeBaseUrl(),
+		httpMethod:          cfg.GetTenantTypeHttpMethod(),
+		contentTypeHeader:   cfg.GetTenantTypeContentType(),
+		authorizationHeader: cfg.GetTenantTypeAuthorization(),
+		apiKey:              cfg.GetTenantTypeApiKey(),
 		prv:                 prvdr,
 	}
 	manager.InitImplWithTerminateHandling(manager)

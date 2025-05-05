@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.8
 
 require (
-	github.com/coredgeio/compass v0.0.0-20250416125353-c6e784e38c05
+	github.com/coredgeio/compass v0.0.0-20250509071236-469013b98030
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb
 	google.golang.org/grpc v1.71.1
@@ -36,11 +36,14 @@ require (
 	github.com/containerd/containerd v1.7.11 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/coredgeio/compass-geolocation v0.0.0-20231106060700-b7460f109b8e // indirect
-	github.com/coredgeio/gosdkclient v0.0.0-20240720174731-b9ed71d8f68b // indirect
-	github.com/coredgeio/orbiter-auth v0.0.0-20250417082519-056c06edfe42 // indirect
+	github.com/coredgeio/gosdkclient v0.0.0-20241102184606-bd815857e389 // indirect
+	github.com/coredgeio/orbiter-auth v0.0.0-20250509075700-eaf1ce6b85dc // indirect
+	github.com/coredgeio/orbiter-baremetal-manager v0.0.0-20250326152721-03287621f7ae // indirect
+	github.com/coredgeio/orbiter-storage-plugin v0.0.0-20250131074912-b928de7bccf4 // indirect
 	github.com/coreos/go-oidc/v3 v3.1.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dghubble/oauth1 v0.7.3 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/distribution/reference v0.5.0 // indirect
 	github.com/docker/cli v25.0.1+incompatible // indirect
@@ -76,6 +79,7 @@ require (
 	github.com/google/go-github/v52 v52.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
+	github.com/google/goterm v0.0.0-20200907032337-555d40f16ae2 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
@@ -91,11 +95,19 @@ require (
 	github.com/jmoiron/sqlx v1.3.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.17.0 // indirect
+	github.com/juju/collections v1.0.4 // indirect
+	github.com/juju/errors v1.0.0 // indirect
+	github.com/juju/gomaasapi/v2 v2.2.0 // indirect
+	github.com/juju/loggo v1.0.0 // indirect
+	github.com/juju/mgo/v2 v2.0.2 // indirect
+	github.com/juju/schema v1.0.1 // indirect
+	github.com/juju/version v0.0.0-20210303051006-2015802527a8 // indirect
+	github.com/klauspost/compress v1.17.6 // indirect
 	github.com/lann/builder v0.0.0-20180802200727-47ae307949d0 // indirect
 	github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
+	github.com/maas/gomaasclient v0.4.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
@@ -158,6 +170,7 @@ require (
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
+	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	helm.sh/helm/v3 v3.14.2 // indirect
