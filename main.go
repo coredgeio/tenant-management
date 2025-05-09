@@ -14,13 +14,22 @@ import (
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
+	tenantruntime "github.com/coredgeio/compass/controller/pkg/runtime/tenant"
 	"github.com/coredgeio/compass/pkg/auth"
 	"github.com/coredgeio/compass/pkg/infra/configdb"
+	"github.com/coredgeio/orbiter-auth/pkg/runtime/tenantuser"
+	"github.com/coredgeio/orbiter-baremetal-manager/pkg/runtime/bms"
 
-	api "github.com/coredgeio/tenant-management/api/config"
+	apiConfig "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
 	"github.com/coredgeio/tenant-management/pkg/config"
+	"github.com/coredgeio/tenant-management/pkg/paymentconfigured"
+	"github.com/coredgeio/tenant-management/pkg/provider"
+	"github.com/coredgeio/tenant-management/pkg/publishmeteringinfo"
 	"github.com/coredgeio/tenant-management/pkg/server"
+	tenantkyc "github.com/coredgeio/tenant-management/pkg/tenantkyc"
+	"github.com/coredgeio/tenant-management/pkg/tenanttype"
+	"github.com/coredgeio/tenant-management/pkg/tenantuserkyc"
 )
 
 const (
@@ -85,11 +94,93 @@ func main() {
 		log.Fatalln("Exiting...")
 	}
 
+	// locating/initializing tenants collection
+	_, err = tenantruntime.NewTenantConfigTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create tenant config table")
+	}
+
+	// locating/initializing tenant-users collection
+	_, err = tenantuser.LocateTenantUserTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create tenant user table")
+	}
+
+	// locating/initializing baremetal-servers collection
+	_, err = bms.LocateBareMetalServerTable()
+	if err != nil {
+		log.Fatalln("unable to locate or create bare metal server table")
+	}
+
+	// setting provider type
+	var prvder provider.Provider
+	switch config.GetClientName() {
+	case "core42":
+		prv := &provider.AiRev{
+			ClientName: config.GetClientName(),
+		}
+		prvder = prv
+	}
+
+	// start the manager for tenant Level KYC
+	if config.GetTenantLevelKYCEnabled() {
+		log.Println("Starting Tenant Level KYC manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the KYC status at the tenant level collection
+		// create tenant role manager
+		go func() {
+			log.Println("Config file path 0: ", cfgPath)
+			_ = tenantkyc.CreateKybManager(prvder)
+		}()
+	}
+
+	// start the manager for Payment Configuration
+	if config.GetPaymentMethodConfigurationEnabled() {
+		log.Println("Starting Payment Configuration manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Payment Configuration status at the tenant level collection
+		go func() {
+			log.Println("Config file path 0: ", cfgPath)
+			_ = paymentconfigured.CreatePaymentConfiguredManager(prvder)
+		}()
+	}
+
+	// start the manager for Tenant Type
+	if config.GetTenantTypeEnabled() {
+		log.Println("Starting Tenant type manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Tenant Type status at the tenant level collection
+		go func() {
+			log.Println("Config file path 0: ", cfgPath)
+			_ = tenanttype.CreateTenantTypeManager(prvder)
+		}()
+	}
+
+	// start the manager for Tenant Type
+	if config.GetTenantUserLevelKYCEnabled() {
+		log.Println("Starting Tenant user level kyc manager...")
+		// call tenant level manager which is working on notification from tenant collections
+		// and updating the Tenant Type status at the tenant level collection
+		go func() {
+			_ = tenantuserkyc.CreateTenantUserLevelKycManager(prvder)
+		}()
+	}
+
+	// start the manager for publishing metering data
+	if config.GetPublishMeteringInfoEnabled() {
+		log.Println("Starting Publish Metering Info manager...")
+		// call publish metering info manager which is working on notification from baremetal-servers collections
+		// and sending data to third party to send to start metering
+		go func() {
+			_ = publishmeteringinfo.CreatePublishMeteringInfoManager(prvder)
+		}()
+	}
+
 	var opts []grpc.ServerOption
 	opts = append(opts, grpc.StreamInterceptor(grpc_auth.StreamServerInterceptor(auth.ProcessUserInfoInContext)))
 	opts = append(opts, grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(auth.ProcessUserInfoInContext)))
 	grpcServer := grpc.NewServer(opts...)
-	api.RegisterSampleApiServer(grpcServer, server.NewSampleApiServer())
+	apiConfig.RegisterSampleApiServer(grpcServer, server.NewSampleApiServer())
 	lis, err := net.Listen("tcp", GRPC_PORT)
 	if err != nil {
 		log.Fatalf("failed to listen: %v for grpc server", err)
@@ -113,16 +204,14 @@ func main() {
 
 	gwmux := gwruntime.NewServeMux(gwruntime.WithIncomingHeaderMatcher(func(key string) (string, bool) {
 		// enable this section while using orbiter-auth module
-		/*
-			if key == auth.UserInfoHeader {
-				return auth.UserInfoContext, true
-			}
-		*/
+		if key == auth.UserInfoHeader {
+			return auth.UserInfoContext, true
+		}
 		return key, false
 	}))
 
 	// Register Sample API server
-	err = api.RegisterSampleApiHandler(context.Background(), gwmux, conn)
+	err = apiConfig.RegisterSampleApiHandler(context.Background(), gwmux, conn)
 	if err != nil {
 		log.Fatal("Failed to register Sample api handler with gateway:", err)
 	}

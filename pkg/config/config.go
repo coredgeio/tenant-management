@@ -16,6 +16,77 @@ type configType struct {
 		Host string `yaml:"host"`
 		Port string `yaml:"port"`
 	} `yaml:"metricsdb"`
+	Client struct {
+		Name string `yaml:"name"`
+	} `yaml:"client"`
+	TenantLevelKYC struct {
+		Enabled           bool `yaml:"enabled"`
+		PollingTime       int  `yaml:"pollingTime"`
+		StopUpdateOnceSet bool `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"tenantLevelKyc"`
+	PaymentConfigurationForTenant struct {
+		Enabled           bool `yaml:"enabled"`
+		PollingTime       int  `yaml:"pollingTime"`
+		StopUpdateOnceSet bool `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"paymentConfigurationForTenant"`
+	TenantType struct {
+		Enabled           bool `yaml:"enabled"`
+		PollingTime       int  `yaml:"pollingTime"`
+		StopUpdateOnceSet bool `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"tenantType"`
+	TenantUserLevelKYC struct {
+		Enabled           bool `yaml:"enabled"`
+		PollingTime       int  `yaml:"pollingTime"`
+		StopUpdateOnceSet bool `yaml:"stopUpdateOnceSet"`
+		RequestDetails    struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"tenantUserLevelKyc"`
+	PublishMeteringInfo struct {
+		Enabled        bool `yaml:"enabled"`
+		RequestDetails struct {
+			BaseUrl        string `yaml:"baseUrl"`
+			HttpMethod     string `yaml:"httpMethod"`
+			DefaultHeaders struct {
+				Authorization string `yaml:"authorization"`
+				ContentType   string `yaml:"contentType"`
+				Apikey        string `yaml:"apikey"`
+			} `yaml:"defaultHeaders"`
+		} `yaml:"requestDetails"`
+	} `yaml:"publishMeteringInfo"`
 }
 
 var config configType
@@ -38,6 +109,201 @@ func GetMetricsdbHost() string {
 // GetMetricsdbPort returns configured metricsdb port
 func GetMetricsdbPort() string {
 	return config.MetricsDB.Port
+}
+
+// GetClientName returns configured client name
+func GetClientName() string {
+	return config.Client.Name
+}
+
+// GetTenantLevelKYCEnabled returns configured TenantLevelKYC enabled
+func GetTenantLevelKYCEnabled() bool {
+	return config.TenantLevelKYC.Enabled
+}
+
+// GetTenantLevelKYCPollingTime returns configured TenantLevelKYC polling time
+func GetTenantLevelKYCPollingTime() int {
+	return config.TenantLevelKYC.PollingTime
+}
+
+// GetTenantLevelKYCStopUpdateOnceSet returns configured TenantLevelKYC stop update once set
+func GetTenantLevelKYCStopUpdateOnceSet() bool {
+	return config.TenantLevelKYC.StopUpdateOnceSet
+}
+
+// GetBaseUrl returns the base URL
+func GetTenantLevelKYCBaseUrl() string {
+	return config.TenantLevelKYC.RequestDetails.BaseUrl
+}
+
+// GetHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetTenantLevelKYCHttpMethod() string {
+	return config.TenantLevelKYC.RequestDetails.HttpMethod
+}
+
+// GetAuthorization returns the Authorization header value
+func GetTenantLevelKYCAuthorization() string {
+	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetContentType returns the Content-Type header value
+func GetTenantLevelKYCContentType() string {
+	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetTenantLevelKYCApiKey returns the apiKey header value
+func GetTenantLevelKYCApiKey() string {
+	return config.TenantLevelKYC.RequestDetails.DefaultHeaders.Apikey
+}
+
+// GetPaymentMethodConfigurationEnabled returns configured Payment Configuration enabled
+func GetPaymentMethodConfigurationEnabled() bool {
+	return config.PaymentConfigurationForTenant.Enabled
+}
+
+// GetPaymentMethodConfigurationPollingTime returns configured Payment configuration polling time
+func GetPaymentMethodConfigurationPollingTime() int {
+	return config.PaymentConfigurationForTenant.PollingTime
+}
+
+// GetPaymentMethodConfigurationStopUpdateOnceSet returns configured Payment Configuration stop update once set
+func GetPaymentMethodConfigurationStopUpdateOnceSet() bool {
+	return config.PaymentConfigurationForTenant.StopUpdateOnceSet
+}
+
+// GetPaymentMethodConfigurationBaseUrl returns the base URL
+func GetPaymentMethodConfigurationBaseUrl() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.BaseUrl
+}
+
+// GetPaymentMethodConfigurationHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetPaymentMethodConfigurationHttpMethod() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.HttpMethod
+}
+
+// GetPaymentMethodConfigurationAuthorization returns the Authorization header value
+func GetPaymentMethodConfigurationAuthorization() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetPaymentMethodConfigurationContentType returns the Content-Type header value
+func GetPaymentMethodConfigurationContentType() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetPaymentMethodConfigurationApiKey returns the apiKey header value
+func GetPaymentMethodConfigurationApiKey() string {
+	return config.PaymentConfigurationForTenant.RequestDetails.DefaultHeaders.Apikey
+}
+
+// GetTenantTypeEnabled returns configured Payment Configuration enabled
+func GetTenantTypeEnabled() bool {
+	return config.TenantType.Enabled
+}
+
+// GetTenantTypePollingTime returns configured Payment configuration polling time
+func GetTenantTypePollingTime() int {
+	return config.TenantType.PollingTime
+}
+
+// GetTenantTypeStopUpdateOnceSet returns configured Payment Configuration stop update once set
+func GetTenantTypeStopUpdateOnceSet() bool {
+	return config.TenantType.StopUpdateOnceSet
+}
+
+// GetTenantTypeBaseUrl returns the base URL
+func GetTenantTypeBaseUrl() string {
+	return config.TenantType.RequestDetails.BaseUrl
+}
+
+// GetTenantTypeHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetTenantTypeHttpMethod() string {
+	return config.TenantType.RequestDetails.HttpMethod
+}
+
+// GetTenantTypeAuthorization returns the Authorization header value
+func GetTenantTypeAuthorization() string {
+	return config.TenantType.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetTenantTypeContentType returns the Content-Type header value
+func GetTenantTypeContentType() string {
+	return config.TenantType.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetTenantTypeApiKey returns the apiKey header value
+func GetTenantTypeApiKey() string {
+	return config.TenantType.RequestDetails.DefaultHeaders.Apikey
+}
+
+// GetTenantUserLevelKycEnabled returns configured Payment Configuration enabled
+func GetTenantUserLevelKYCEnabled() bool {
+	return config.TenantUserLevelKYC.Enabled
+}
+
+// GetTenantUserLevelKYCPollingTime returns configured Payment configuration polling time
+func GetTenantUserLevelKYCPollingTime() int {
+	return config.TenantUserLevelKYC.PollingTime
+}
+
+// GetTenantUserLevelKYCStopUpdateOnceSet returns configured Payment Configuration stop update once set
+func GetTenantUserLevelKYCStopUpdateOnceSet() bool {
+	return config.TenantUserLevelKYC.StopUpdateOnceSet
+}
+
+// GetTenantUserLevelKYCBaseUrl returns the base URL
+func GetTenantUserLevelKYCBaseUrl() string {
+	return config.TenantUserLevelKYC.RequestDetails.BaseUrl
+}
+
+// GetTenantUserLevelKYCHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetTenantUserLevelKYCHttpMethod() string {
+	return config.TenantUserLevelKYC.RequestDetails.HttpMethod
+}
+
+// GetTenantUserLevelKYCAuthorization returns the Authorization header value
+func GetTenantUserLevelKYCAuthorization() string {
+	return config.TenantUserLevelKYC.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetTenantUserLevelKYCContentType returns the Content-Type header value
+func GetTenantUserLevelKYCContentType() string {
+	return config.TenantUserLevelKYC.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetTenantUserLevelKYCApiKey returns the apiKey header value
+func GetTenantUserLevelKYCApiKey() string {
+	return config.TenantUserLevelKYC.RequestDetails.DefaultHeaders.Apikey
+}
+
+// GetPublishMeteringInfoEnabled returns configured Publish Metering Data enabled
+func GetPublishMeteringInfoEnabled() bool {
+	return config.PublishMeteringInfo.Enabled
+}
+
+// GetPublishMeteringInfoBaseUrl returns the base URL
+func GetPublishMeteringInfoBaseUrl() string {
+	return config.PublishMeteringInfo.RequestDetails.BaseUrl
+}
+
+// GetPublishMeteringInfoHttpMethod returns the HTTP method (GET, POST, etc.)
+func GetPublishMeteringInfoHttpMethod() string {
+	return config.PublishMeteringInfo.RequestDetails.HttpMethod
+}
+
+// GetPublishMeteringInfoAuthorization returns the Authorization header value
+func GetPublishMeteringInfoAuthorization() string {
+	return config.PublishMeteringInfo.RequestDetails.DefaultHeaders.Authorization
+}
+
+// GetPublishMeteringInfoContentType returns the Content-Type header value
+func GetPublishMeteringInfoContentType() string {
+	return config.PublishMeteringInfo.RequestDetails.DefaultHeaders.ContentType
+}
+
+// GetPublishMeteringInfoApiKey returns the apiKey header value
+func GetPublishMeteringInfoApiKey() string {
+	return config.PublishMeteringInfo.RequestDetails.DefaultHeaders.Apikey
 }
 
 // validateConfigPath just makes sure, that the path provided is a file,
