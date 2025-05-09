@@ -7,6 +7,9 @@
   "tags": [
     {
       "name": "SampleApi"
+    },
+    {
+      "name": "TenantMgmtApi"
     }
   ],
   "consumes": [
@@ -62,6 +65,141 @@
           "SampleApi"
         ]
       }
+    },
+    "/v1/tenant/{tenant}/email/{email}/tenant-user-level-kyc": {
+      "get": {
+        "summary": "get tenant user level kyc status",
+        "operationId": "TenantMgmtApi_GetTenantUserLevelKycStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantUserLevelKycStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant",
+            "description": "tenant under consideration",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "description": "email under consideration",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantMgmtApi"
+        ]
+      }
+    },
+    "/v1/tenant/{tenant}/payment-method-configuration": {
+      "get": {
+        "summary": "get payment configuration status",
+        "operationId": "TenantMgmtApi_GetPaymentMethodConfigurationStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configPaymentMethodConfigurationStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant",
+            "description": "tenant under consideration",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantMgmtApi"
+        ]
+      }
+    },
+    "/v1/tenant/{tenant}/tenant-level-kyc": {
+      "get": {
+        "summary": "get tenant level kyc status",
+        "operationId": "TenantMgmtApi_GetTenantLevelKycStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantLevelKycStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant",
+            "description": "tenant under consideration",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantMgmtApi"
+        ]
+      }
+    },
+    "/v1/tenant/{tenant}/tenant-type": {
+      "get": {
+        "summary": "get tenant type",
+        "operationId": "TenantMgmtApi_GetTenantType",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantTypeResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenant",
+            "description": "tenant under consideration",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "TenantMgmtApi"
+        ]
+      }
     }
   },
   "definitions": {
@@ -80,6 +218,62 @@
         "text": {
           "type": "string",
           "title": "returning the string query parameter"
+        }
+      }
+    },
+    "configPaymentMethodConfigurationStatusResp": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "type": "string",
+          "title": "tenant under consideration"
+        },
+        "isPaymentMethodSet": {
+          "type": "boolean",
+          "title": "kyc status in bool"
+        }
+      }
+    },
+    "configTenantLevelKycStatusResp": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "type": "string",
+          "title": "tenant under consideration"
+        },
+        "isKybDone": {
+          "type": "boolean",
+          "title": "kyc status in bool"
+        }
+      }
+    },
+    "configTenantTypeResp": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "type": "string",
+          "title": "tenant under consideration"
+        },
+        "tenantType": {
+          "type": "string",
+          "title": "tenant type"
+        }
+      }
+    },
+    "configTenantUserLevelKycStatusResp": {
+      "type": "object",
+      "properties": {
+        "tenant": {
+          "type": "string",
+          "title": "tenant under consideration"
+        },
+        "email": {
+          "type": "string",
+          "title": "email under consideration"
+        },
+        "isKycDone": {
+          "type": "boolean",
+          "title": "kyc status in bool"
         }
       }
     },

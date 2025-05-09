@@ -1,0 +1,103 @@
+// Copyright 2025, Coredge.io Inc.
+// All Rights reserved.
+//
+// Author Akash Sharma (akash.sharma@coredge.io)
+
+syntax = "proto3";
+
+package config;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/coredgeio/tenant-management/api/config";
+
+// These annotations are used when generating the OpenAPI file.
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    version: "1.0"
+    title: "tenant management API spec"
+  }
+  external_docs: {
+    description: "Tenant Management API spec, sample"
+  }
+};
+
+service TenantMgmtApi {
+  // get tenant level kyc status
+  rpc GetTenantLevelKycStatus(GenericStatusReq) returns (TenantLevelKycStatusResp) {
+    option (google.api.http) = {
+        get: "/v1/tenant/{tenant}/tenant-level-kyc"
+    };
+  }
+
+  // get tenant user level kyc status
+  rpc GetTenantUserLevelKycStatus(TenantUserLevelKycStatusReq) returns (TenantUserLevelKycStatusResp) {
+    option (google.api.http) = {
+        get: "/v1/tenant/{tenant}/email/{email}/tenant-user-level-kyc"
+    };
+  }
+
+  // get payment configuration status
+  rpc GetPaymentMethodConfigurationStatus(GenericStatusReq) returns (PaymentMethodConfigurationStatusResp) {
+    option (google.api.http) = {
+        get: "/v1/tenant/{tenant}/payment-method-configuration"
+    };
+  }
+
+  // get tenant type
+  rpc GetTenantType(GenericStatusReq) returns (TenantTypeResp) {
+    option (google.api.http) = {
+        get: "/v1/tenant/{tenant}/tenant-type"
+    };
+  }
+}
+  
+message GenericStatusReq {
+  // tenant under consideration
+  string tenant = 1;
+}
+
+message TenantLevelKycStatusResp {
+  // tenant under consideration
+  string tenant = 1;
+
+  // kyc status in bool
+  bool isKybDone = 2;
+}
+
+message TenantUserLevelKycStatusReq {
+  // tenant under consideration
+  string tenant = 1;
+
+  // email under consideration
+  string email = 2;
+}
+  
+message TenantUserLevelKycStatusResp {
+  // tenant under consideration
+  string tenant = 1;
+  
+  // email under consideration
+  string email = 2;
+
+  // kyc status in bool
+  bool isKycDone = 3;
+}
+    
+message PaymentMethodConfigurationStatusResp {
+  // tenant under consideration
+  string tenant = 1;
+  
+  // kyc status in bool
+  bool isPaymentMethodSet = 2;
+}
+
+message TenantTypeResp {
+  // tenant under consideration
+  string tenant = 1;
+    
+  // tenant type
+  string tenantType = 2;
+}
+
