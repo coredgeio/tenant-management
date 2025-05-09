@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "AI/ML orchestrator API spec",
+    "title": "tenant management API spec",
     "version": "1.0"
   },
   "tags": [
     {
-      "name": "SampleApi"
+      "name": "TenantMgmtApi"
     }
   ],
   "consumes": [
@@ -16,15 +16,15 @@
     "application/json"
   ],
   "paths": {
-    "/v1/project/{project}": {
+    "/v1/payment-config": {
       "get": {
-        "summary": "hello world",
-        "operationId": "SampleApi_HelloWorld",
+        "summary": "get payment configuration status",
+        "operationId": "TenantMgmtApi_GetPaymentConfigStatus",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/configHelloWorldResp"
+              "$ref": "#/definitions/configPaymentConfigStatusResp"
             }
           },
           "default": {
@@ -34,52 +34,155 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "project",
-            "description": "project, url argument for mandatory parameters usually forming key fields\nfor API",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "offset",
-            "description": "query parameter following type match requirements.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          },
-          {
-            "name": "text",
-            "description": "string query parameter.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
         "tags": [
-          "SampleApi"
+          "TenantMgmtApi"
+        ]
+      }
+    },
+    "/v1/tenant-kyc": {
+      "get": {
+        "summary": "get tenant level kyc status",
+        "operationId": "TenantMgmtApi_GetTenantKycStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantKycStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TenantMgmtApi"
+        ]
+      }
+    },
+    "/v1/tenant-type": {
+      "get": {
+        "summary": "get tenant type",
+        "operationId": "TenantMgmtApi_GetTenantType",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantTypeResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TenantMgmtApi"
+        ]
+      }
+    },
+    "/v1/tenant-user-kyc": {
+      "get": {
+        "summary": "get tenant user level kyc status",
+        "operationId": "TenantMgmtApi_GetTenantUserKycStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/configTenantUserKycStatusResp"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "TenantMgmtApi"
         ]
       }
     }
   },
   "definitions": {
-    "configHelloWorldResp": {
+    "configKycStatus": {
+      "type": "string",
+      "enum": [
+        "Unspecified",
+        "Pending",
+        "InProcess",
+        "Failed",
+        "Partial",
+        "Done",
+        "ReKycNeeded"
+      ],
+      "default": "Unspecified",
+      "title": "- Unspecified: Default value, unspecified status\n - Pending: KYC pending\n - InProcess: Kyc in process\n - Failed: kyc failed\n - Partial: kyc partial\n - Done: kyc done successfully\n - ReKycNeeded: re-kyc is required"
+    },
+    "configPaymentConfigStatusResp": {
       "type": "object",
       "properties": {
-        "project": {
-          "type": "string",
-          "title": "project in respose message"
+        "isPayMethodSet": {
+          "type": "boolean",
+          "title": "payment method configured or not"
+        }
+      }
+    },
+    "configTenantKycStatusResp": {
+      "type": "object",
+      "properties": {
+        "isKycDone": {
+          "type": "boolean",
+          "title": "kyc status in bool"
         },
-        "offset": {
-          "type": "integer",
-          "format": "int32",
-          "title": "returing the query offset"
-        },
-        "text": {
+        "kycStatus": {
+          "$ref": "#/definitions/configKycStatus",
+          "title": "kycStatus in enum"
+        }
+      }
+    },
+    "configTenantType": {
+      "type": "string",
+      "enum": [
+        "Unknown",
+        "Individual",
+        "Organization"
+      ],
+      "default": "Unknown",
+      "title": "- Unknown: unknown tenant type\n - Individual: individual tenant type\n - Organization: organization tenant type"
+    },
+    "configTenantTypeResp": {
+      "type": "object",
+      "properties": {
+        "tenantType": {
+          "$ref": "#/definitions/configTenantType",
+          "title": "tenant type"
+        }
+      }
+    },
+    "configTenantUserKycStatusResp": {
+      "type": "object",
+      "properties": {
+        "email": {
           "type": "string",
-          "title": "returning the string query parameter"
+          "title": "email under consideration"
+        },
+        "username": {
+          "type": "string",
+          "title": "username under consideration"
+        },
+        "isKycDone": {
+          "type": "boolean",
+          "title": "kyc status in bool"
+        },
+        "kycStatus": {
+          "$ref": "#/definitions/configKycStatus",
+          "title": "kycStatus in enum"
         }
       }
     },
@@ -112,6 +215,6 @@
     }
   },
   "externalDocs": {
-    "description": "AI/ML orchestrator API spec, sample"
+    "description": "Tenant Management API spec, sample"
   }
 }
