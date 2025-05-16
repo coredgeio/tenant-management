@@ -1,0 +1,111 @@
+// Copyright 2025, Coredge.io Inc.
+// All Rights reserved.
+//
+// Author Akash Sharma (akash.sharma@coredge.io)
+
+syntax = "proto3";
+
+package config;
+
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/coredgeio/tenant-management/api/config";
+
+// These annotations are used when generating the OpenAPI file.
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info : {version : "1.0" title : "tenant management API spec"}
+  external_docs : {description : "Tenant Management API spec, sample"}
+};
+
+service TenantMgmtApi {
+  // get tenant level kyc status
+  rpc GetTenantKycStatus(GenericStatusReq) returns (TenantKycStatusResp) {
+    option (google.api.http) = {
+      get : "/v1/tenant-kyc"
+    };
+  }
+
+  // get tenant user level kyc status
+  rpc GetTenantUserKycStatus(GenericStatusReq)
+      returns (TenantUserKycStatusResp) {
+    option (google.api.http) = {
+      get : "/v1/tenant-user-kyc"
+    };
+  }
+
+  // get payment configuration status
+  rpc GetPaymentConfigStatus(GenericStatusReq)
+      returns (PaymentConfigStatusResp) {
+    option (google.api.http) = {
+      get : "/v1/payment-config"
+    };
+  }
+
+  // get tenant type
+  rpc GetTenantType(GenericStatusReq) returns (TenantTypeResp) {
+    option (google.api.http) = {
+      get : "/v1/tenant-type"
+    };
+  }
+}
+
+enum KycStatus {
+  // Default value, unknown status
+  Unspecified = 0;
+  // KYC pending
+  Pending = 1;
+  // Kyc in process
+  InProcess = 2;
+  // kyc failed
+  Failed = 3;
+  // kyc partial
+  Partial = 4;
+  // kyc done successfully
+  Done = 5;
+  // re-kyc is required
+  ReKycNeeded = 6;
+}
+
+enum TenantType {
+  // unknown tenant type
+  Unknown = 0;
+  // individual tenant type
+  Individual = 1;
+  // organization tenant type
+  Organization = 2;
+}
+
+message GenericStatusReq {}
+
+message TenantKycStatusResp {
+  // kyc status in bool
+  bool isKycDone = 1;
+
+  // kycStatus in enum
+  KycStatus kycStatus = 2;
+}
+
+message TenantUserKycStatusResp {
+  // email under consideration
+  string email = 1;
+
+  // username under consideration
+  string username = 2;
+
+  // kyc status in bool
+  bool isKycDone = 3;
+
+  // kycStatus in enum
+  KycStatus kycStatus = 4;
+}
+
+message PaymentConfigStatusResp {
+  // payment method configured or not
+  bool isPayMethodSet = 1;
+}
+
+message TenantTypeResp {
+  // tenant type
+  TenantType tenantType = 1;
+}
