@@ -36,17 +36,17 @@ type configType struct {
 		Enabled bool `yaml:"enabled"`
 		// this field makes sure that we stop polling once we have received our desired response if set to true
 		StopUpdateOnceSet bool            `yaml:"stopUpdateOnceSet"`
-		EndpointDetails   EndpointDetails `yaml:"requestDetails"`
+		EndpointDetails   EndpointDetails `yaml:"endpointDetails"`
 	} `yaml:"tenantMetadata"`
 	TenantUserMetadata struct {
 		Enabled bool `yaml:"enabled"`
 		// this field makes sure that we stop polling once we have received our desired response if set to true
 		StopUpdateOnceSet bool            `yaml:"stopUpdateOnceSet"`
-		EndpointDetails   EndpointDetails `yaml:"requestDetails"`
+		EndpointDetails   EndpointDetails `yaml:"endpointDetails"`
 	} `yaml:"tenantUserMetadata"`
 	PublishMeteringInfo struct {
 		Enabled         bool            `yaml:"enabled"`
-		EndpointDetails EndpointDetails `yaml:"requestDetails"`
+		EndpointDetails EndpointDetails `yaml:"endpointDetails"`
 	} `yaml:"publishMeteringInfo"`
 }
 
