@@ -50,7 +50,7 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 		return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 	}
 
-	if entry.KYC == nil {
+	if entry.Email != "" && entry.KYC == nil {
 		log.Printf("KYC value not set for entry %s, fetching information from Tenant User KYC server\n", entry.Key.Username)
 		for {
 			// Add a sleep interval to prevent 100% CPU usage
@@ -63,7 +63,7 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 			// making a request to the server
 			// update the URL as per your requirement
 			// for now not making it generic and will be making use of hardcoded values and appending at the end
-			r.mgr.baseUrl = r.mgr.baseUrl + "/" + entry.Key.Tenant + "/" + entry.Email
+			r.mgr.baseUrl = r.mgr.baseUrl + "/" + entry.Key.Tenant + "/users/" + entry.Email + "/kyc"
 			req, err := http.NewRequest(r.mgr.httpMethod, r.mgr.baseUrl, nil)
 			if err != nil {
 				// something unexpected happened and we will retry after 5 seconds from the start
