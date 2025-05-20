@@ -14,11 +14,11 @@ import (
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 
+	"github.com/coredgeio/compass/controller/pkg/runtime/events"
 	tenantruntime "github.com/coredgeio/compass/controller/pkg/runtime/tenant"
 	"github.com/coredgeio/compass/pkg/auth"
 	"github.com/coredgeio/compass/pkg/infra/configdb"
 	"github.com/coredgeio/orbiter-auth/pkg/runtime/tenantuser"
-	"github.com/coredgeio/orbiter-baremetal-manager/pkg/runtime/bms"
 
 	apiConfig "github.com/coredgeio/tenant-management/api/config"
 	"github.com/coredgeio/tenant-management/api/config/swagger"
@@ -104,10 +104,10 @@ func main() {
 		log.Fatalln("unable to locate or create tenant user table")
 	}
 
-	// locating/initializing baremetal-servers collection
-	_, err = bms.LocateBareMetalServerTable()
+	// locating/initializing events collection
+	_, err = events.LocateEventsTable()
 	if err != nil {
-		log.Fatalln("unable to locate or create bare metal server table")
+		log.Fatalln("Failed to locate events table", err)
 	}
 
 	// setting provider type
