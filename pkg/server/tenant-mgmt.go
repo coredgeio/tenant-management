@@ -124,7 +124,7 @@ func (s *TenantManagementServer) GetTenantUserKycStatus(ctx context.Context, req
 }
 
 // whether payment method is set or not for a tenant
-func (s *TenantManagementServer) GetPaymentMethodConfigurationStatus(ctx context.Context, req *api.GenericStatusReq) (*api.PaymentConfigStatusResp, error) {
+func (s *TenantManagementServer) GetPaymentConfigStatus(ctx context.Context, req *api.GenericStatusReq) (*api.PaymentConfigStatusResp, error) {
 	log.Printf("Received Payment Method Configured status request for tenant")
 	userInfo, found := auth.GetUserInfo(ctx)
 	if !found {
