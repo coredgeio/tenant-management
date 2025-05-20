@@ -14,6 +14,8 @@ github.com/cncf/udpa/go v0.0.0-20201120205902-5459f2c99403/go.mod h1:WmhPx2Nbnht
 github.com/cncf/xds/go v0.0.0-20210312221358-fbca930ec8ed/go.mod h1:eXthEFrGJvWHgFFCl3hGmgk+/aYT6PnTQLykKQRLhEs=
 github.com/coredgeio/compass v0.0.0-20250516102325-de2bf6ff323e h1:qKnmIHnt3buUxUzGsX6LsK4/5Te2n58j2IWNJhYU1vk=
 github.com/coredgeio/compass v0.0.0-20250516102325-de2bf6ff323e/go.mod h1:t4D7qA4El8bCkVL20xxhKblOjsp8JoCjBCro6a6NPUE=
+github.com/coredgeio/compass v0.0.0-20250518125656-1aece1ccd516 h1:ej/2L977BKaVFLni9ST77V/7GjrltvNfmy707Q8LQa0=
+github.com/coredgeio/compass v0.0.0-20250518125656-1aece1ccd516/go.mod h1:t4D7qA4El8bCkVL20xxhKblOjsp8JoCjBCro6a6NPUE=
 github.com/coredgeio/orbiter-auth v0.0.0-20250511064054-a7ecee4ecf78 h1:ZuZOJGxFEDUFkitMTCLUS5+GJPvt7xS0vIDeNHZMQgg=
 github.com/coredgeio/orbiter-auth v0.0.0-20250511064054-a7ecee4ecf78/go.mod h1:QfZGYlPMIcUHGoyrbff6csZVOGzdd9rlXnpkYcZhId0=
 github.com/coredgeio/orbiter-baremetal-manager v0.0.0-20250326152721-03287621f7ae h1:NKgiM6BcjMtOJTFv3bhzgrrXJtaOMDjugL7gu5q8XuU=
