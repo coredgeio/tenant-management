@@ -49,13 +49,11 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 		log.Println("Something unexpected went wrong,retrying again")
 		return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 	}
-
-	if entry.Email != "" && entry.KYC == nil {
-		log.Printf("KYC value not set for entry %s, fetching information from Tenant User KYC server\n", entry.Key.Username)
-		for {
-			// Add a sleep interval to prevent 100% CPU usage
-			time.Sleep(time.Duration(r.mgr.interval) * time.Second)
-
+	log.Printf("TenantUserMetadataReconciler: Entry fetched: %v\n", entry)
+	baseUrl := r.mgr.baseUrl + "/" + entry.Key.Tenant + "/users/" + entry.Email + "/kyc"
+	go func(url string) {
+		if entry.Email != "" && entry.KYC == nil {
+			log.Printf("KYC value not set for entry %s, fetching information from Tenant User KYC server\n", entry.Key.Username)
 			// need to make an http call to fetch the value from db
 			// getting client from package
 			client := httpclient.GetClient()
@@ -68,69 +66,74 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 			if err != nil {
 				// something unexpected happened and we will retry after 5 seconds from the start
 				log.Printf("Something unexpected went wrong while creating request,retrying again, error: %s\n", err)
-				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
+				return
 			}
 
 			if r.mgr.apiKey != "" {
 				req.Header.Set("apiKey", r.mgr.apiKey)
 			}
+			for {
+				// Add a sleep interval to prevent 100% CPU usage
+				time.Sleep(time.Duration(r.mgr.interval) * time.Second)
 
-			// Send the request
-			resp, err := client.Do(req)
-			if err != nil {
-				// something unexpected happened and we will retry after 5 seconds from the start
-				log.Printf("Something unexpected went wrong while sending request,retrying again, error: %s\n", err)
-				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-			}
-			defer resp.Body.Close()
-
-			// Read the response body
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				// something unexpected happened and we will retry after 5 seconds from the start
-				log.Printf("Something unexpected went wrong while reading response,retrying again, error: %s\n", err)
-				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-			}
-
-			// Print the response for now, once APIs are provided this will be sent to specific package
-			log.Println("Response status:", resp.Status)
-			log.Println("Response body:", string(body))
-
-			// convert the response into provider specific struct and fetch tenant user level kyc specific data
-			// on basis of client name
-			var kycStatus tenant.KYCStatus
-			var kycErr error
-			kycStatus, kycErr = r.mgr.provider.GetTenantUserKycStatus(body)
-			if kycErr != nil {
-				// something unexpected happened and we will retry after 5 seconds from the start
-				log.Printf("Something unexpected went wrong while fetching kyb status from API,retrying again, error: %s\n", err)
-				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-			}
-
-			// once value is fetched, need to set value in tenants collection
-			// only setting value in case KYC was done successfully else keeping it as it is
-			if kycStatus == tenant.KYCDone {
-				// updating information in tenants collection
-				update := &tenantuser.TenantUser{
-					Key: entry.Key,
-					KYC: &tenant.TenantKyc{
-						Status: kycStatus,
-					},
-				}
-				err := r.mgr.tenantUserTable.Update(update)
+				// Send the request
+				resp, err := client.Do(req)
 				if err != nil {
 					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while updating kyb status in tenant config collection,retrying again, error: %s\n", err)
-					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
+					log.Printf("Something unexpected went wrong while sending request,retrying again, error: %s\n", err)
+					continue
+				}
+				defer resp.Body.Close()
+
+				// Read the response body
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					// something unexpected happened and we will retry after 5 seconds from the start
+					log.Printf("Something unexpected went wrong while reading response,retrying again, error: %s\n", err)
+					continue
+				}
+
+				// Print the response for now, once APIs are provided this will be sent to specific package
+				log.Println("Response status:", resp.Status)
+				log.Println("Response body:", string(body))
+
+				// convert the response into provider specific struct and fetch tenant user level kyc specific data
+				// on basis of client name
+				var kycStatus tenant.KYCStatus
+				var kycErr error
+				kycStatus, kycErr = r.mgr.provider.GetTenantUserKycStatus(body)
+				if kycErr != nil {
+					// something unexpected happened and we will retry after 5 seconds from the start
+					log.Printf("Something unexpected went wrong while fetching kyb status from API,retrying again, error: %s\n", err)
+					continue
+				}
+
+				// once value is fetched, need to set value in tenants collection
+				// only setting value in case KYC was done successfully else keeping it as it is
+				if kycStatus == tenant.KYCDone {
+					// updating information in tenants collection
+					update := &tenantuser.TenantUser{
+						Key: entry.Key,
+						KYC: &tenant.TenantKyc{
+							Status: kycStatus,
+						},
+					}
+					err := r.mgr.tenantUserTable.Update(update)
+					if err != nil {
+						// something unexpected happened and we will retry after 5 seconds from the start
+						log.Printf("Something unexpected went wrong while updating kyb status in tenant config collection,retrying again, error: %s\n", err)
+						continue
+					}
+				}
+
+				// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
+				if (kycStatus == tenant.KYCDone) && r.mgr.stopOnceSet {
+					break
 				}
 			}
-
-			// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
-			if (kycStatus == tenant.KYCDone) && r.mgr.stopOnceSet {
-				break
-			}
+			return
 		}
-	}
+	}(baseUrl)
 
 	return &notifier.Result{}, nil
 }
