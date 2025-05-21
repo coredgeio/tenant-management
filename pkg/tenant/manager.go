@@ -59,13 +59,10 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 		return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
 	}
 	log.Printf("TenantMetadataReconciler: Entry fetched: %v\n", entry)
-
-	if entry.Kyc == nil || entry.PaymentConfigured == nil || entry.TenantType == nil {
-		log.Printf("KYC or Payment method or tenant type not set for entry %s, fetching information from external server\n", entry.Key.Name)
-		for {
-			// Add a sleep interval to prevent 100% CPU usage
-			time.Sleep(time.Duration(r.mgr.interval) * time.Second)
-
+	baseUrl := r.mgr.baseUrl + "/" + entry.Key.Name
+	go func(baseUrl string) {
+		if entry.Kyc == nil || entry.PaymentConfigured == nil || entry.TenantType == nil {
+			log.Printf("KYC or Payment method or tenant type not set for entry %s, fetching information from external server\n", entry.Key.Name)
 			// need to make an http call to fetch the value from db
 			// getting client from package
 			client := httpclient.GetClient()
@@ -74,12 +71,11 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 			// making a request to the server
 			// update the URL as per your requirement
 			// for now not making it generic and will be making use of hardcoded values and appending at the end
-			r.mgr.baseUrl = r.mgr.baseUrl + "/" + entry.Key.Name
-			req, err := http.NewRequest(r.mgr.httpMethod, r.mgr.baseUrl, nil)
+			req, err := http.NewRequest(r.mgr.httpMethod, baseUrl, nil)
 			if err != nil {
 				// something unexpected happened and we will retry after 5 seconds from the start
 				log.Printf("Something unexpected went wrong while creating request,retrying again, error: %s\n", err)
-				continue
+				return
 			}
 			log.Printf("TenantMetadataReconciler: Request created: %v\n", req)
 
@@ -88,133 +84,145 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 				req.Header.Set("apiKey", r.mgr.apiKey)
 			}
 
-			// Send the request
-			resp, err := client.Do(req)
-			if err != nil {
-				// something unexpected happened and we will retry after 5 seconds from the start
-				log.Printf("Something unexpected went wrong while sending request,retrying again, error: %s\n", err)
-				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-			}
-			defer resp.Body.Close()
-			log.Printf("TenantMetadataReconciler: Response received: %v\n", resp)
+			for {
+				log.Println("Request url: ", baseUrl)
+				// Add a sleep interval to prevent 100% CPU usage
+				time.Sleep(time.Duration(r.mgr.interval) * time.Second)
 
-			// Read the response body
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				// something unexpected happened and we will retry after 5 seconds from the start
-				log.Printf("Something unexpected went wrong while reading response,retrying again, error: %s\n", err)
-				return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-			}
-			log.Printf("TenantMetadataReconciler: Body received: %v\n", body)
-
-			// Print the response for now, once APIs are provided this will be sent to specific package
-			log.Println("Response status:", resp.Status)
-			log.Println("Response body:", string(body))
-
-			var tenantKycFound, tenantTypeFound, tenantPayMethodFound bool
-
-			// check if the entry already has kyc value set
-			if entry.Kyc == nil {
-				// convert the response into provider specific struct and fetch tenant kyc specific data
-				// on basis of client name
-				var tenantKyc tenant.KYCStatus
-				var kycErr error
-				tenantKyc, kycErr = r.mgr.provider.GetTenantKycStatus(body)
-				if kycErr != nil {
+				// Send the request
+				resp, err := client.Do(req)
+				if err != nil {
 					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while fetching tenant kyc status from API,retrying again, error: %s\n", err)
-					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
+					log.Printf("Something unexpected went wrong while sending request,retrying again, error: %s\n", err)
+					continue
+				}
+				defer resp.Body.Close()
+				log.Printf("TenantMetadataReconciler: Response received: %v\n", resp)
+
+				// Read the response body
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					// something unexpected happened and we will retry after 5 seconds from the start
+					log.Printf("Something unexpected went wrong while reading response,retrying again, error: %s\n", err)
+					continue
+				}
+				log.Printf("TenantMetadataReconciler: Body received: %v\n", body)
+
+				// Print the response for now, once APIs are provided this will be sent to specific package
+				log.Println("Response status:", resp.Status)
+				log.Println("Response body:", string(body))
+
+				if resp.StatusCode != 200 {
+					log.Printf("Invalid response: %s\n", err)
+					continue
 				}
 
-				// once value is fetched, need to set value in tenants collection
-				// only setting value in case KYC was done successfully else keeping it as it is
-				if tenantKyc == tenant.KYCDone {
+				var tenantKycFound, tenantTypeFound, tenantPayMethodFound bool
+
+				// check if the entry already has kyc value set
+				if entry.Kyc == nil {
+					// convert the response into provider specific struct and fetch tenant kyc specific data
+					// on basis of client name
+					var tenantKyc tenant.KYCStatus
+					var kycErr error
+					tenantKyc, kycErr = r.mgr.provider.GetTenantKycStatus(body)
+					if kycErr != nil {
+						// something unexpected happened and we will retry after 5 seconds from the start
+						log.Printf("Something unexpected went wrong while fetching tenant kyc status from API,retrying again, error: %s\n", err)
+						continue
+					}
+
+					// once value is fetched, need to set value in tenants collection
+					// only setting value in case KYC was done successfully else keeping it as it is
+					if tenantKyc == tenant.KYCDone {
+						// updating information in tenants collection
+						update := &tenant.TenantConfig{
+							Key: entry.Key,
+							Kyc: &tenant.TenantKyc{
+								Status: tenantKyc,
+							},
+						}
+						err := r.mgr.tenantConfTable.Update(update)
+						if err != nil {
+							// something unexpected happened and we will retry after 5 seconds from the start
+							log.Printf("Something unexpected went wrong while updating tenant kyc status in tenant config collection,retrying again, error: %s\n", err)
+							continue
+						}
+						tenantKycFound = true
+					}
+				} else {
+					tenantKycFound = true
+				}
+				// check if the entry already has tenant type value set
+				if entry.TenantType == nil {
+					// convert the response into provider specific struct and fetch tenant type specific data
+					// on basis of client name
+					var tenantType tenant.TenantType
+					var tenantTypeErr error
+					tenantType, tenantTypeErr = r.mgr.provider.GetTenantType(body)
+
+					if tenantTypeErr != nil {
+						// something unexpected happened and we will retry after 5 seconds from the start
+						log.Printf("Something unexpected went wrong while fetching tenant kyc status from API,retrying again, error: %s\n", err)
+						continue
+					}
+
+					// once value is fetched, need to set value in tenants collection
+					// only setting value in case TenantType was either Individual or organization
 					// updating information in tenants collection
 					update := &tenant.TenantConfig{
-						Key: entry.Key,
-						Kyc: &tenant.TenantKyc{
-							Status: tenantKyc,
-						},
+						Key:        entry.Key,
+						TenantType: &tenantType,
 					}
-					err := r.mgr.tenantConfTable.Update(update)
+					err = r.mgr.tenantConfTable.Update(update)
 					if err != nil {
 						// something unexpected happened and we will retry after 5 seconds from the start
 						log.Printf("Something unexpected went wrong while updating tenant kyc status in tenant config collection,retrying again, error: %s\n", err)
-						return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
+						continue
 					}
-					tenantKycFound = true
+					tenantTypeFound = true
+				} else {
+					tenantTypeFound = true
 				}
-			} else {
-				tenantKycFound = true
-			}
-			// check if the entry already has tenant type value set
-			if entry.TenantType == nil {
-				// convert the response into provider specific struct and fetch tenant type specific data
-				// on basis of client name
-				var tenantType tenant.TenantType
-				var tenantTypeErr error
-				tenantType, tenantTypeErr = r.mgr.provider.GetTenantType(body)
+				if entry.PaymentConfigured == nil {
+					// convert the response into provider specific struct and fetch payment config data
+					// on basis of client name
+					var paymentConfiguredStatus bool
+					var paymentConfiguredStatusErr error
+					paymentConfiguredStatus, paymentConfiguredStatusErr = r.mgr.provider.GetPaymentConfiguredStatus(body)
 
-				if tenantTypeErr != nil {
-					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while fetching tenant kyc status from API,retrying again, error: %s\n", err)
-					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-				}
-
-				// once value is fetched, need to set value in tenants collection
-				// only setting value in case TenantType was either Individual or organization
-				// updating information in tenants collection
-				update := &tenant.TenantConfig{
-					Key:        entry.Key,
-					TenantType: &tenantType,
-				}
-				err = r.mgr.tenantConfTable.Update(update)
-				if err != nil {
-					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while updating tenant kyc status in tenant config collection,retrying again, error: %s\n", err)
-					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-				}
-				tenantTypeFound = true
-			} else {
-				tenantTypeFound = true
-			}
-			if entry.PaymentConfigured == nil {
-				// convert the response into provider specific struct and fetch payment config data
-				// on basis of client name
-				var paymentConfiguredStatus bool
-				var paymentConfiguredStatusErr error
-				paymentConfiguredStatus, paymentConfiguredStatusErr = r.mgr.provider.GetPaymentConfiguredStatus(body)
-
-				if paymentConfiguredStatusErr != nil {
-					// something unexpected happened and we will retry after 5 seconds from the start
-					log.Printf("Something unexpected went wrong while fetching payment configured status from API,retrying again, error: %s\n", err)
-					return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
-				}
-
-				// once value is fetched, need to set value in tenants collection
-				if paymentConfiguredStatus {
-					// updating information in tenants collection
-					update := &tenant.TenantConfig{
-						Key:               entry.Key,
-						PaymentConfigured: utils.BoolP(paymentConfiguredStatus),
-					}
-					err := r.mgr.tenantConfTable.Update(update)
-					if err != nil {
+					if paymentConfiguredStatusErr != nil {
 						// something unexpected happened and we will retry after 5 seconds from the start
-						log.Printf("Something unexpected went wrong while updating payment configured status in tenant config collection, retrying again, error: %s\n", err)
-						return &notifier.Result{NotifyAfter: 5 * time.Second}, nil
+						log.Printf("Something unexpected went wrong while fetching payment configured status from API,retrying again, error: %s\n", err)
+						continue
 					}
+
+					// once value is fetched, need to set value in tenants collection
+					if paymentConfiguredStatus {
+						// updating information in tenants collection
+						update := &tenant.TenantConfig{
+							Key:               entry.Key,
+							PaymentConfigured: utils.BoolP(paymentConfiguredStatus),
+						}
+						err := r.mgr.tenantConfTable.Update(update)
+						if err != nil {
+							// something unexpected happened and we will retry after 5 seconds from the start
+							log.Printf("Something unexpected went wrong while updating payment configured status in tenant config collection, retrying again, error: %s\n", err)
+							continue
+						}
+						tenantPayMethodFound = true
+					}
+				} else {
 					tenantPayMethodFound = true
 				}
-			} else {
-				tenantPayMethodFound = true
-			}
-			// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
-			if tenantKycFound && tenantPayMethodFound && tenantTypeFound && r.mgr.stopOnceSet {
-				break
+				// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
+				if tenantKycFound && tenantPayMethodFound && tenantTypeFound && r.mgr.stopOnceSet {
+					return
+				}
+				return
 			}
 		}
-	}
+	}(baseUrl)
 
 	return &notifier.Result{}, nil
 }
