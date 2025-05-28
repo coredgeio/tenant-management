@@ -1,0 +1,34 @@
+name: Docker Image Release
+on:
+  release:
+    types: [published]
+
+jobs:
+  orbiter-auth-release:
+    runs-on: newgroup
+    steps:
+    - uses: actions/checkout@v2
+    - name: Login to docker hub
+      env:
+        DOCKER_USER: ${{secrets.DOCKERHUB_USER}}
+        DOCKER_PWD: ${{secrets.DOCKERHUB_PUSH_TOKEN}}
+      run: sudo docker login -u $DOCKER_USER -p $DOCKER_PWD
+    - name: pre-cleanup the docker
+      run: sudo docker system prune -a -f && sudo docker buildx prune
+    - name: Set up Go Environment
+      uses: actions/setup-go@v2
+      with:
+        go-version: "1.22.x"
+    - name: Prepare image tag
+      run: echo "TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
+    - name: Build docker image
+      env:
+        GIT_TOKEN: ${{secrets.AUTH_SECRET_01}}
+      run: |
+        git config --global url."https://${GIT_TOKEN}:x-oauth-basic@github.com/coredgeio".insteadOf "https://github.com/coredgeio"
+        go env -w GOPRIVATE=github.com/coredgeio/*
+        VERSION=${{ env.TAG }} make -j2
+    - name: Push the docker image
+      run: VERSION=${{ env.TAG }} make push-images
+    - name: cleanup the docker
+      run: sudo docker logout && sudo docker system prune -a -f && sudo docker buildx prune
