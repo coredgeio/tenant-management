@@ -33,7 +33,7 @@ type tenantData struct {
 	// tenant kyc details
 	KybDetails     kYBData     `json:"kyb"`
 	PaymentDetails paymentData `json:"credit"`
-	Tier           string      `json:"tier"`
+	Tier           int         `json:"tier"`
 	AccountType    string      `json:"accountType"`
 }
 
@@ -91,7 +91,7 @@ func (a *AiRev) GetTenantKycStatus(body []byte) (tenant.KYCStatus, error) {
 	var resp genericResponse
 	err := json.Unmarshal(body, &resp)
 	if err != nil {
-		log.Printf("Error while unmarshaling response for KYB in AiRev, error: %s\n", err)
+		log.Printf("Error while unmarshaling response for Tenant KYB in AiRev, error: %s\n", err)
 		// using negative value to indicate that we have received an error response
 		return -1, err
 	}
@@ -115,7 +115,7 @@ func (a *AiRev) GetTenantUserKycStatus(body []byte) (tenant.KYCStatus, error) {
 	var resp tenantUserKycResponse
 	err := json.Unmarshal(body, &resp)
 	if err != nil {
-		log.Printf("Error while unmarshaling response for KYB in AiRev, error: %s\n", err)
+		log.Printf("Error while unmarshaling response for Tenant User KYC in AiRev, error: %s\n", err)
 		// using negative value to indicate that we have received an error response
 		return -1, err
 	}
@@ -149,7 +149,7 @@ func (a *AiRev) GetTenantType(body []byte) (tenant.TenantType, error) {
 	var resp genericResponse
 	err := json.Unmarshal(body, &resp)
 	if err != nil {
-		log.Printf("Error while unmarshaling response for KYB in AiRev, error: %s\n", err)
+		log.Printf("Error while unmarshaling response for Tenant Type in AiRev, error: %s\n", err)
 		// using negative value to indicate that we have received an error response
 		return -1, err
 	}
