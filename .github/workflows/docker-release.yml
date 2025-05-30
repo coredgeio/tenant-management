@@ -5,7 +5,7 @@ on:
 
 jobs:
   orbiter-auth-release:
-    runs-on: newgroup
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
     - name: Login to docker hub

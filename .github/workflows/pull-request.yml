@@ -4,7 +4,7 @@ on:
     types: [opened, reopened, edited, synchronize]
 jobs:
   auth-build-pull-request:
-    runs-on: newgroup
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
     - name: Set up Go Environment
@@ -22,7 +22,7 @@ jobs:
       run: sudo docker system prune -a -f
   golangci:
     name: golangci-lint
-    runs-on: newgroup
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
