@@ -111,7 +111,7 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 
 				// once value is fetched, need to set value in tenants collection
 				// only setting value in case KYC was done successfully else keeping it as it is
-				if kycStatus == tenant.KYCDone {
+				if kycStatus == tenant.KYCDone || kycStatus == tenant.KYCInProcess {
 					// updating information in tenants collection
 					update := &tenantuser.TenantUser{
 						Key: entry.Key,
