@@ -100,7 +100,7 @@ func (a *AiRev) GetTenantKycStatus(body []byte) (tenant.KYCStatus, error) {
 	case pending:
 		return tenant.KYCPending, nil
 	case attempted:
-		return tenant.KYCPending, nil
+		return tenant.KYCInProcess, nil
 	case rejected:
 		return tenant.KYCFailed, nil
 	case failed:
@@ -124,7 +124,7 @@ func (a *AiRev) GetTenantUserKycStatus(body []byte) (tenant.KYCStatus, error) {
 	case pending:
 		return tenant.KYCPending, nil
 	case attempted:
-		return tenant.KYCPending, nil
+		return tenant.KYCInProcess, nil
 	case rejected:
 		return tenant.KYCFailed, nil
 	case failed:
