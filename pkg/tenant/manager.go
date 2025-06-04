@@ -61,7 +61,7 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 	log.Printf("TenantMetadataReconciler: Entry fetched: %v\n", entry)
 	baseUrl := r.mgr.baseUrl + "/" + entry.Key.Name
 	go func(baseUrl string) {
-		if entry.Kyc == nil || entry.PaymentConfigured == nil || entry.TenantType == nil {
+		if entry.Kyc == nil || entry.PaymentConfigured == nil || entry.TenantType == nil || (entry.Kyc != nil && entry.Kyc.Status != tenant.KYCDone) {
 			log.Printf("KYC or Payment method or tenant type not set for entry %s, fetching information from external server\n", entry.Key.Name)
 			// need to make an http call to fetch the value from db
 			// getting client from package
@@ -109,8 +109,8 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 				log.Printf("TenantMetadataReconciler: Body received: %v\n", body)
 
 				// Print the response for now, once APIs are provided this will be sent to specific package
-				log.Println("Response status:", resp.Status)
-				log.Println("Response body:", string(body))
+				log.Println("TenantMetadataReconciler : Response status:", resp.Status)
+				log.Println("TenantMetadataReconciler : Response body:", string(body))
 
 				if resp.StatusCode != 200 {
 					log.Printf("Invalid response: %s\n", err)
@@ -118,9 +118,10 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 				}
 
 				var tenantKycFound, tenantTypeFound, tenantPayMethodFound bool
+				var currentKycStatus tenant.KYCStatus
 
 				// check if the entry already has kyc value set
-				if entry.Kyc == nil {
+				if entry.Kyc == nil || (entry.Kyc != nil && entry.Kyc.Status != tenant.KYCDone) {
 					// convert the response into provider specific struct and fetch tenant kyc specific data
 					// on basis of client name
 					var tenantKyc tenant.KYCStatus
@@ -134,7 +135,14 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 
 					// once value is fetched, need to set value in tenants collection
 					// only setting value in case KYC was done successfully else keeping it as it is
-					if tenantKyc == tenant.KYCDone || tenantKyc == tenant.KYCInProcess {
+					if tenantKyc == tenant.KYCDone || tenantKyc == tenant.KYCInProcess || tenantKyc == tenant.KYCFailed {
+						if currentKycStatus == tenantKyc {
+							log.Printf("KYC status for tenant %s is already set to %+v, skipping update\n", entry.Key.Name, tenantKyc)
+							continue
+						} else {
+							currentKycStatus = tenantKyc
+						}
+						log.Printf("Updating KYC status for tenant: %s to : %+v", entry.Key.Name, tenantKyc)
 						// updating information in tenants collection
 						update := &tenant.TenantConfig{
 							Key: entry.Key,
@@ -148,7 +156,9 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 							log.Printf("Something unexpected went wrong while updating tenant kyc status in tenant config collection,retrying again, error: %s\n", err)
 							continue
 						}
-						tenantKycFound = true
+						if tenantKyc == tenant.KYCDone {
+							tenantKycFound = true
+						}
 					}
 				} else {
 					tenantKycFound = true
@@ -166,7 +176,7 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 						log.Printf("Something unexpected went wrong while fetching tenant kyc status from API,retrying again, error: %s\n", err)
 						continue
 					}
-
+					log.Printf("Updating Tenant type for tenant: %s to : %+v", entry.Key.Name, tenantType)
 					// once value is fetched, need to set value in tenants collection
 					// only setting value in case TenantType was either Individual or organization
 					// updating information in tenants collection
@@ -199,6 +209,7 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 
 					// once value is fetched, need to set value in tenants collection
 					if paymentConfiguredStatus {
+						log.Printf("Updating Payment Configured status for tenant: %s to : %+v", entry.Key.Name, paymentConfiguredStatus)
 						// updating information in tenants collection
 						update := &tenant.TenantConfig{
 							Key:               entry.Key,
@@ -217,10 +228,13 @@ func (r *TenantMetadataReconciler) Reconcile(rkey interface{}) (*notifier.Result
 				}
 				// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
 				if tenantKycFound && tenantPayMethodFound && tenantTypeFound && r.mgr.stopOnceSet {
+					log.Println("Tenant : exiting goroutine : kyc done, payment done and tenant type done received and stoponceset : entry:", entry.Key.Name)
 					return
 				}
-				return
+
 			}
+		} else {
+			return
 		}
 	}(baseUrl)
 
