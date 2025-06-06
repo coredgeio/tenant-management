@@ -51,8 +51,8 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 	}
 	log.Printf("TenantUserMetadataReconciler: Entry fetched: %v\n", entry)
 	baseUrl := r.mgr.baseUrl + "/" + entry.Key.Tenant + "/users/" + entry.Email + "/kyc"
-	go func(url string) {
-		if entry.Email != "" && entry.KYC == nil {
+	go func(baseUrl string) {
+		if (entry.Email != "" && entry.KYC == nil) || (entry.Email != "" && entry.KYC != nil && entry.KYC.Status != tenant.KYCDone) {
 			log.Printf("KYC value not set for entry %s, fetching information from Tenant User KYC server\n", entry.Key.Username)
 			// need to make an http call to fetch the value from db
 			// getting client from package
@@ -61,7 +61,6 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 			// making a request to the server
 			// update the URL as per your requirement
 			// for now not making it generic and will be making use of hardcoded values and appending at the end
-			baseUrl := r.mgr.baseUrl + "/" + entry.Key.Tenant + "/users/" + entry.Email + "/kyc"
 			req, err := http.NewRequest(r.mgr.httpMethod, baseUrl, nil)
 			if err != nil {
 				// something unexpected happened and we will retry after 5 seconds from the start
@@ -73,10 +72,10 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 				req.Header.Set("apiKey", r.mgr.apiKey)
 			}
 			for {
-				// Add a sleep interval to prevent 100% CPU usage
-				time.Sleep(time.Duration(r.mgr.interval) * time.Second)
 				log.Println("TenantUserKycReconciler: Sending request to fetch KYC information for tenant user:", entry.Key.Username)
 				log.Println("baseUrl:", baseUrl)
+				// Add a sleep interval to prevent 100% CPU usage
+				time.Sleep(time.Duration(r.mgr.interval) * time.Second)
 				// Send the request
 				resp, err := client.Do(req)
 				if err != nil {
@@ -85,6 +84,7 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 					continue
 				}
 				defer resp.Body.Close()
+				log.Printf("TenantUserMetadataReconciler: Response received: %v\n", resp)
 
 				// Read the response body
 				body, err := io.ReadAll(resp.Body)
@@ -95,13 +95,14 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 				}
 
 				// Print the response for now, once APIs are provided this will be sent to specific package
-				log.Println("Response status:", resp.Status)
-				log.Println("Response body:", string(body))
+				log.Println("TenantUserMetadataReconciler : Response status:", resp.Status)
+				log.Println("TenantUserMetadataReconciler : Response body:", string(body))
 
 				// convert the response into provider specific struct and fetch tenant user level kyc specific data
 				// on basis of client name
 				var kycStatus tenant.KYCStatus
 				var kycErr error
+				var currentStatus tenant.KYCStatus
 				kycStatus, kycErr = r.mgr.provider.GetTenantUserKycStatus(body)
 				if kycErr != nil {
 					// something unexpected happened and we will retry after 5 seconds from the start
@@ -111,7 +112,14 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 
 				// once value is fetched, need to set value in tenants collection
 				// only setting value in case KYC was done successfully else keeping it as it is
-				if kycStatus == tenant.KYCDone || kycStatus == tenant.KYCInProcess {
+				if kycStatus == tenant.KYCDone || kycStatus == tenant.KYCInProcess || kycStatus == tenant.KYCFailed {
+					if currentStatus == kycStatus {
+						log.Printf("KYC status for tenant user %s is already set to %+v, skipping update\n", entry.Key.Username, kycStatus)
+						continue
+					} else {
+						currentStatus = kycStatus
+					}
+					log.Printf("Updating KYC status for tenant user: %s to : %+v", entry.Key.Username, kycStatus)
 					// updating information in tenants collection
 					update := &tenantuser.TenantUser{
 						Key: entry.Key,
@@ -129,10 +137,12 @@ func (r *TenantUserKycReconciler) Reconcile(rkey interface{}) (*notifier.Result,
 
 				// once value is set in db and config.stopOnceValueIsSet is true, send true to chan done
 				if (kycStatus == tenant.KYCDone) && r.mgr.stopOnceSet {
+					log.Println("Tenant User : exiting goroutine : kyc done received and stoponceset : entry:", entry.Key.Username)
 					return
 				}
-				return
 			}
+		} else {
+			return
 		}
 	}(baseUrl)
 
